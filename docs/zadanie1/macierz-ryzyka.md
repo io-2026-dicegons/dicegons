@@ -8,10 +8,10 @@
 | P↓\W→     | **1** | **2** | **3** | **4** | **5** |
 | ---       | ----- | ----- | ----- | ----- | ----- |
 | **5**     |   .   |   .   |   .   |   .   |   R4  |
-| **4**     |   .   |   R5  |   .   |   R2  |   .   |
+| **4**     |   R6  |   R5  |   .   |   R2  |   .   |
 | **3**     |   .   |   R1  |   R8  |   .   |   R3  |
 | **2**     |   .   |   .   |   .   |   R7  |   .   |
-| **1**     |   .   |   .   |   .   |   R6  |   .   |
+| **1**     |   .   |   .   |   .   |   .   |   .   |
 
 Identyfikator danego ryzyka (umieszczony w macierzy) jest powiązany z jego nazwą zgodnie z listą w ListaRyzyk.md
 
