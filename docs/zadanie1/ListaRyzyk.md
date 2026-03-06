@@ -1,4 +1,4 @@
-| ID Problemu | Nazwa Problemu                                     | Powiązane zadanie | Wpływ  | Szansa | Opis                                                                                  |
+| ID Problemu | Nazwa Problemu                                     | Powiązane zadanie | Wpływ  | Szansa | Rozwiązanie                                                                                  |
 | ----------- | -------------------------------------------------- | ----------------- | -----  | ------ | ------------------------------------------------------------------------------------- |
 | R1          | Balans                                             | zad 6             | 2      | 3      | Zwiększenie czasu testowania gry i przewidujące podejścia do projektowania systemów |
 | R2          | Powtarzalność                                      | zad 2             | 4      | 4      | Dodanie większej ilości opcji graczowi                                                |
