@@ -1,3 +1,10 @@
+Domena Biznesowa:
+
+Nasza gra ma na celu trafienie w gusta głównie 3 grup graczy: Fanów strategii, fanów gier losowych oraz graczy gier typu rougelike. Największe nasze nastawienie będzie celowane w nich, ale nie chcemy odpychać wszelkie inne grupy od naszego produktu, dlatego nie będziemy w pełni rezygnować z podejścia oraz otwartości dla pozostałych grup graczy. Mimo tego będziemy celować głównie w rozwijanie najważniejszych cech gry dla naszego core community.
+
+⠀
+
+Persony:
 | Nazwa persony                     | Opis persony                                                                                         | Zapotrzebowania                                                                                   | Szacowana wielkość społeczności | 
 | --------------------------        | ------------------------------------------------------------------------------------------           | --------------                                                                                    | ------------------------------- | 
 | Cassualowi gracze                 | Osoby nastawione na dobrą zabawę                                                                     | Wciągająca rozgrywka oraz niski próg wejścia                                                      | Duża                            |
