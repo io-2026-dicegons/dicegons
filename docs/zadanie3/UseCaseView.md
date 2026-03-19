@@ -1,4 +1,5 @@
-graph LR
+```mermaid
+graph LR;
     subgraph Gra
       U01([ Otworzenie scenariusza])
       U02([ Tworzenie nowego scenariusza])
@@ -6,8 +7,7 @@ graph LR
       U04([ Zapisanie gry])
       U05([ Odczytanie gry])
       U06([ ????])
-      
-    end
+END
 
 Gracz[ Gracz]
 
@@ -19,3 +19,6 @@ Gracz --- U05
 Gracz --- U06
 
 Gracz --- U07
+
+
+```
