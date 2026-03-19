@@ -11,14 +11,10 @@ END
 
 Gracz[ Gracz]
 
-Gracz --- U01
+Gracz---U01
 Gracz --- U02
 Gracz --- U03
 Gracz --- U04
 Gracz --- U05
 Gracz --- U06
-
-Gracz --- U07
-
-
 ```
