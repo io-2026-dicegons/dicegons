@@ -3,8 +3,7 @@
 
 Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
 
-
-## Otworzenie istniejącego scenariusza (U01)
+## Otworzenie istniejącego scenariusza 
 
 - **Warunki wstępne:** Gra w stanie początkowym (menu główne) 
 - **Scenariusz (główny przepływ):**
@@ -17,7 +16,7 @@ Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
     4B. Walidacja scenariusza zawiodła, system informuje gracza. Kończy przypadek użycia.
 - **Warunki końcowe:** Gracz może rozpocząć rozgrywkę
 
-## Stworzenie nowego scenariusza (U02)
+## Stworzenie nowego scenariusza 
 
 - **Warunki wstępne:** Gra w stanie początkowym (menu główne) 
 - **Scenariusz (główny przepływ):**
@@ -39,7 +38,7 @@ Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
 - **Warunki końcowe:** Nowy scenariusz został utworzony.
 
 
-## Edycja istniejącego scenariusza (U03)
+## Edycja istniejącego scenariusza 
 
 - **Warunki wstępne:** Gra w stanie początkowym (menu główne) 
 - **Scenariusz (główny przepływ):**
@@ -56,7 +55,7 @@ Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
     7B. Zapis scenariusza nie powiódł się. System wyświetla informację o powodzie. Gracz potwierdza zapoznanie się z powodem. Przypadek kończy się (Powrót do menu głównego).
 - **Warunki końcowe:** dany scenariusz został zmodyfikowany. 
 
-## Zapisanie gry (U04)
+## Zapisanie gry 
 
 - **Warunki wstępne:** Gra w trakcie rozgrywki. Aktualna tura należy do gracza.
 - **Scenariusz (główny przepływ):**
@@ -67,7 +66,7 @@ Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
 - **Wyjątki/ alternatywne scenariusze:**
 - **Warunki końcowe:** Plik z stanem rozgrywki został utworzony/nadpisany.
 
-## Wczytanie gry (U05)
+## Wczytanie gry 
 
 - **Warunki wstępne:** Gra w stanie początkowym (menu główne) 
 - **Scenariusz (główny przepływ):**
@@ -79,12 +78,12 @@ Wszystkie poniższe przypadki użycia wykorzystują "Gracza" jako aktora.
 - **Warunki końcowe:** Gra została wczytana. Gracz może kontynuować rozgrywkę.
 
 
-## Atak (U06)
+## Atak 
 
-- **Warunki wstępne:** Rozgrywka trwa. Aktualna tura należy do gracza A, w fazie ataku. 
+- **Warunki wstępne:** Rozgrywka w trakcie. Aktualna tura należy do gracza A, w fazie ataku. 
 Istnieją dwie, połączone prowincje należące do różnych właścicieli. 
 - **Scenariusz (główny przepływ):**
-    1. Gracz wybiera własną prowincję zawierającą jednostki.
+    1 . Gracz wybiera własną prowincję zawierającą jednostki.
     2. System zaznacza wybraną prowincję.
     3. Gracz wybiera osiągalną prowincję należące do innego gracza.
     4. System oblicza i wyświetla rezultat bitwy. W przypadku sukcesu atakowana prowincja zmienia właściciela. Jednostki poprzednio istniejące w prowincji zostają usunięte (zabite). Atakująca armia zostaje przesunięta do nowej prowincji. Wyświetlana mapa zostaje zaktualizowana.
@@ -92,9 +91,9 @@ Istnieją dwie, połączone prowincje należące do różnych właścicieli.
     4B. W przypadku porażki atakującej armii zostaje ona zredukowana. Prowincje nie zmieniają właścicieli. Przypadek kończy się.
 - **Warunki końcowe:** Gracz przeprowadził atak.
 
-## Ruch (U07)
+## Ruch 
 
-- **Warunki wstępne:** Rozgrywka trwa. Aktualna tura należy do gracza A, w fazie ruchu. 
+- **Warunki wstępne:** Rozgrywka w trakcie. Aktualna tura należy do gracza A, w fazie ruchu. 
 Istnieją dwie prowincje należące do gracza A, gdzie co najmniej jedna z nich zawiera jednostki.
 - **Scenariusz (główny przepływ):**
     1. Gracz wybiera własną prowincję zawierającą jednostki.
@@ -107,5 +106,18 @@ Istnieją dwie prowincje należące do gracza A, gdzie co najmniej jedna z nich 
         Jeżeli lokacja docelowa jest zajęta przez jednostki, które nie wykonały ruchu w obecnej turze, wybrane odziały z prowincji docelowej/początkowej zamieniają się miejscami.
     8. System uaktualnia widok mapy. 
 - **Wyjątki/ alternatywne scenariusze:**    
-    7B System: Jeżeli lokacja docelowa jest pusta, wybrana armia zostaje przeniesiona. Przejście do kroku 8.
-- **Warunki końcowe:** Jednostki zamieniły się miejscami
+    7B. System: Jeżeli lokacja docelowa jest pusta, wybrana armia zostaje przeniesiona. Przejście do kroku 8.
+- **Warunki końcowe:** Jednostki zamieniły się miejscami/zostały przeniesione.
+
+## Tura gracza 
+
+- **Warunki wstępne:** Rozgrywka w trakcie. Początek nowej tury dla danego gracza.
+- **Scenariusz (główny przepływ):**
+    1. System: Przejście do fazy ataku.
+    2. Gracz może wykonać wielokrotnie wykonać akcję "Atak" (o ile możliwa) lub zapisać grę (scenariusz zapisanie gry). 
+    3. System przechodzi do fazy ruchu.
+    4. Gracz może wykonać wielokrotnie wykonać akcję "Ruch" (o ile możliwa) lub zapisać grę (scenariusz zapisanie gry). 
+    5. System przechodzi do kolejnej tury (dla innego gracza).
+ **Wyjątki/ alternatywne scenariusze:**    
+    2B, 4B - Gracz wybiera opcję "Zakończ grę". System kończy obecną rozgrywkę i przechodzi do menu głównego. Koniec przypadku.
+- **Warunki końcowe:** Koniec tury obecnego gracza
