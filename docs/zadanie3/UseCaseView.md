@@ -18,9 +18,9 @@ Gracz --- U02;
 Gracz --- U03;
 Gracz --- U05;
 Gracz --- U08;
-U04 -. include .-> U08
-U06 -. include .-> U08
-U07 -. include .-> U08
+U04 -. extend .-> U08
+U06 -. extend .-> U08
+U07 -. extend .-> U08
 
 
 ```
