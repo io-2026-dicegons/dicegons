@@ -17,6 +17,7 @@ classDiagram
     Tura "1" <|-- "!" Faza
     Main_Game "1" <|-- "1" Opis
     Prowincja <|-- Prowincja
+    Prowincja "1" <|-- "1" Gracz
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
     
     
