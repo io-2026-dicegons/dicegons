@@ -15,8 +15,10 @@ classDiagram
     Main_Game "1" <|-- "inf" Gracz
     Main_Game "1" <|-- "1" Tura
     Tura "1" <|-- "!" Faza
-
+    Main_Game "1" <|-- "1" Opis
+    Prowincja <|-- Prowincja
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
+    
     
     class Main_Game{
         list Player
@@ -28,6 +30,10 @@ classDiagram
     class Tura{
         int Nr_Tury
         int ID_Fazy
+    }
+
+    class Opis{
+        string opis
     }
 
     class Faza{
