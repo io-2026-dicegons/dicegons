@@ -63,16 +63,20 @@ classDiagram
     }
 
     class Typ_Jednostki{
-        int ID_Jednostki
-        int Atak
-        int Obrona
+        int ID_Typu_Jednostki
+        int Atak_Kostka
+        Atak_Modifier()
+        int Obrona_Kostka
+        OBrona_Modifier()
         int Max_Stos 
     }
+
+    mod:  2d12 x - 6 
 
     class Odział{
         int ID_Odziału
         int Aktualna_Liczba
-        int ID_Jednostki
+        int ID_Typu_Jednostki
     }
 
     class Armia{
@@ -83,12 +87,12 @@ classDiagram
 
     class Teren{
         string Nazwa_terenu
-        Modifier
+        Modifier()
     }
 
     class Budynki{
         string Nazwa_Budynku
-        Modifier
+        Modifier()
     }
 
     class Hexes{
