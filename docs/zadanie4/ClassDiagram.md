@@ -71,8 +71,6 @@ classDiagram
         int Max_Stos 
     }
 
-    mod:  2d12 x - 6 
-
     class Odział{
         int ID_Odziału
         int Aktualna_Liczba
