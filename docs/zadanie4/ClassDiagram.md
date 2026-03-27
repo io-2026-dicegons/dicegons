@@ -24,8 +24,8 @@ classDiagram
 
     class ControlUI
     {
-        OnClick(x,y)
-        OnHover(x,y)
+        OnClick()
+        OnHover()
         OnButtonPress()
         OnKeyPress
         OnDrag()
@@ -48,8 +48,8 @@ classDiagram
         string Opis
         int Turn
 
-        Attack(from,to)
-        Move(from,to)
+        Attack()
+        Move()
         SetUnit()
         NextPhase()
         NextTurn()
