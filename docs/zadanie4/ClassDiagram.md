@@ -51,6 +51,16 @@ classDiagram
         +SetUnit()
         +NextPhase()
         +NextTurn()
+
+        +GetPhase()
+        +GetPlayingPlayer()
+        +GetTurn()
+        +GetPlayerList()
+        +GetWidth()
+        +GetHeight()
+        +GetProvinesList()
+
+        
     }
 
     class Tura{
@@ -70,10 +80,10 @@ classDiagram
     class Gracz{
         int Gracz_ID
         string Nick
+        int Gold
     }
 
     class Mapa{
-        int Map_ID
         list Prowincje
     }
     
@@ -85,37 +95,59 @@ classDiagram
         list Budynki
         list Sąsiedzi
         list Hex
+
+        +GetOwner()
+        +GetHexesList()
+        +GetArmy()
+        +GetBuilding()
+        +GetTerrainType()
     }
 
     class Typ_Jednostki{
         int ID_Typu_Jednostki
         int Atak_Kostka
-        Atak_Modifier()
+        int Atak_Modifier
         int Obrona_Kostka
-        OBrona_Modifier()
-        int Max_Stos 
+        int OBrona_Modifier
+        int Max_Stos
+        int Price
+
+        +GetID()
+        +GetAttackDice()
+        +GetAttackModifier()
+        +GetDefenseDice()
+        +GetDefenseModifier()
+        +GetMaxQuantity()
+        +GetPrice()
     }
 
     class Odział{
         int ID_Odziału
         int Aktualna_Liczba
         int ID_Typu_Jednostki
+
+        +GetQuantity()
+        +GetUnitType()
     }
 
     class Armia{
         int ID_Armii
         int ID_Odziału_1
         int ID_Odziału_2
+
+        +GetSquadCount()
+        +GetFirstSquad()
+        +GetSecondSquad()
     }
 
     class Teren{
         string Nazwa_terenu
-        Modifier()
+        int Modifier
     }
 
     class Budynki{
         string Nazwa_Budynku
-        Modifier()
+        int Modifier
     }
 
     class Hexes{
