@@ -16,16 +16,43 @@ classDiagram
     Main_Game "1" <|-- "1" Tura
     Tura "1" <|-- "!" Faza
     Main_Game "1" <|-- "1" Opis
-    Prowincja <|-- Prowincja
     Prowincja "1" <|-- "1" Gracz
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
-    
-    
+    ControlUI "1" <|-- "1" DrawUI
+    DrawUI "1" <|-- "1" Main_Game
+    ControlUI "1" <|-- "1" Main_Game
+
+    class ControlUI
+    {
+        OnClick(x,y)
+        OnHover(x,y)
+        OnButtonPress()
+        OnKeyPress
+        OnDrag()
+        CenterOnTile()
+    }
+
+    class DrawUI
+    {
+        Render()
+        DrawButton()
+        DrawMap()
+        DrawProvince()
+        DrawHex()
+        DrawUnit()
+    }
+
     class Main_Game{
         list Player
         int Map_ID
         string Opis
         int Turn
+
+        Attack(from,to)
+        Move(from,to)
+        SetUnit()
+        NextPhase()
+        NextTurn()
     }
 
     class Tura{
@@ -97,5 +124,6 @@ classDiagram
         int x
         int y
     }
+
 
 ```
