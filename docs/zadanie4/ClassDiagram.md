@@ -20,7 +20,14 @@ classDiagram
     ControlUI "1" <|-- "1" DrawUI
     DrawUI "1" <|-- "1" Main_Game
     ControlUI "1" <|-- "1" Main_Game
+    ControlUI "1" <|-- "1" Ai
+    Ai "1" <|-- "1" Main_Game
+    
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
+
+    class Ai{
+        +GetAction()
+    }
 
     class ControlUI{
         +OnClick()
