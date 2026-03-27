@@ -33,3 +33,6 @@ Pasuje więc idealnie to do naszej koncepcji, gdyż mamy strukturę drzewa podse
 
 Memento to wzorzec który pokazuje nam jak zapisywać poprzednie stany aplikacji. Z uwagi na to, że chcemy zaimplementować system zapisywania gry, potrzebujemy jakiegoś sposobu na zapisywanie informacji o stanie gry w czasie zapisu. Dzięki niemu możemy stworzyć właśnie snapshota stanu gry w danym momencie, aby gracz mógł do niego wrócić w późniejszym czasie, bądź wykorzystamy ten system do tworzenia customowych scenariuszy. Jest on też polecany jak program potrzebuje sposobu na powrót do swojego wcześniejszego stanu więc wszystko się łaczy w całość, zwłaszcza że w gamedevie reusing zdawałoby się niepowiązanych schematów i rozwiązań jest często na porządku dziennym.
 
+<h3>Mediator(Mediator)</h3>
+
+Mediator to byt który jest centrum komunikacyjnym projektu. U nas rolę mediatora wykonuje GUI, które przyjmuje imputy gracza, oraz wysyła dane polecenia do systemu gry w oczekiwaniu na reakcje zwrotną, aby wiedzieć co wyświetlić. Nie jest to mediator zupełny, gdyż nie będziemy potrzebować go do komunikacja Gry z Plikami gry, ale potrzebujemy go do relacji Gracz - Gra, gdyż nie chcemy jak w Doki Doki Literature Club aby gracz bezpośrednio mógł wpływać na pliki gry (chyba że jest moderem ale to jest specyficzny przypadek użycia.
