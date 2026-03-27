@@ -14,7 +14,7 @@ classDiagram
     Main_Game "1" <|-- "1" Mapa
     Main_Game "1" <|-- "inf" Gracz
     Main_Game "1" <|-- "1" Tura
-    Tura "1" <|-- "!" Faza
+    Tura "1" <|-- "1" Faza
     Main_Game "1" <|-- "1" Opis
     Prowincja "1" <|-- "1" Gracz
     ControlUI "1" <|-- "1" DrawUI
@@ -24,22 +24,22 @@ classDiagram
 
     class ControlUI
     {
-        OnClick()
-        OnHover()
-        OnButtonPress()
-        OnKeyPress
-        OnDrag()
-        CenterOnTile()
+        +OnClick()
+        +OnHover()
+        +OnButtonPress()
+        +OnKeyPress()
+        +OnDrag()
+        +CenterOnTile()
     }
 
     class DrawUI
     {
-        Render()
-        DrawButton()
-        DrawMap()
-        DrawProvince()
-        DrawHex()
-        DrawUnit()
+        +Render()
+        +DrawButton()
+        +DrawMap()
+        +DrawProvince()
+        +DrawHex()
+        +DrawUnit()
     }
 
     class Main_Game{
@@ -48,11 +48,11 @@ classDiagram
         string Opis
         int Turn
 
-        Attack()
-        Move()
-        SetUnit()
-        NextPhase()
-        NextTurn()
+        +Attack()
+        +Move()
+        +SetUnit()
+        +NextPhase()
+        +NextTurn()
     }
 
     class Tura{
