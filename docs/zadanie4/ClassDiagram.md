@@ -9,10 +9,10 @@ classDiagram
     Prowincja "1" <|-- "1" Armia
     Prowincja "1" <|-- "1" Teren
     Prowincja "1" <|-- "1" Budynki
-    Prowincja "1" <|-- "inf" Hexes
-    Mapa "1" <|-- "inf" Prowincja
+    Prowincja "1" <|-- "*" Hexes
+    Mapa "1" <|-- "*" Prowincja
     Main_Game "1" <|-- "1" Mapa
-    Main_Game "1" <|-- "inf" Gracz
+    Main_Game "1" <|-- "*" Gracz
     Main_Game "1" <|-- "1" Tura
     Tura "1" <|-- "1" Faza
     Main_Game "1" <|-- "1" Opis
@@ -22,8 +22,7 @@ classDiagram
     ControlUI "1" <|-- "1" Main_Game
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
 
-    class ControlUI
-    {
+    class ControlUI{
         +OnClick()
         +OnHover()
         +OnButtonPress()
@@ -32,8 +31,7 @@ classDiagram
         +CenterOnTile()
     }
 
-    class DrawUI
-    {
+    class DrawUI{
         +Render()
         +DrawButton()
         +DrawMap()
