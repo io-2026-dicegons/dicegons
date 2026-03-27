@@ -17,10 +17,10 @@ classDiagram
     Tura "1" <|-- "!" Faza
     Main_Game "1" <|-- "1" Opis
     Prowincja "1" <|-- "1" Gracz
-    note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
     ControlUI "1" <|-- "1" DrawUI
     DrawUI "1" <|-- "1" Main_Game
     ControlUI "1" <|-- "1" Main_Game
+    note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
 
     class ControlUI
     {
