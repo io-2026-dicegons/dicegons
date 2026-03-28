@@ -108,6 +108,7 @@ classDiagram
         +GetArmy()
         +GetBuilding()
         +GetTerrainType()
+        +GetArmyDefenceMean()
     }
 
     class Typ_Jednostki{
@@ -135,6 +136,7 @@ classDiagram
 
         +GetQuantity()
         +GetUnitType()
+        +GetSquadMean()
     }
 
     class Armia{
@@ -145,6 +147,7 @@ classDiagram
         +GetSquadCount()
         +GetFirstSquad()
         +GetSecondSquad()
+        +GetArmyAttackMean()
     }
 
     class Teren{
