@@ -119,8 +119,10 @@ classDiagram
         int OBrona_Modifier
         int Max_Stos
         int Price
-        int Max_Rzut
-        int Min_Rzut
+        int Max_Obronny_Rzut
+        int Min_Obronny_Rzut
+        int Max_Atakujący_Rzut
+        int Min_Atakujacy_Rzut
 
         +GetID()
         +GetAttackDice()
