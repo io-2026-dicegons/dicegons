@@ -4,10 +4,11 @@ import pytest
 def unit_type():
     return UnitType(
         ID_Typu_Jednostki=1,
+        name="Peasants",
         Atak_Kostka=2,
         Atak_Modifier=1,
         Obrona_Kostka=2,
-        OBrona_Modifier=1,
+        Obrona_Modifier=1,
         Max_Stos=10,
         Price=100
     )
@@ -72,6 +73,7 @@ def province(player, army):
 
 def test_unit_type_getters(unit_type):
     assert unit_type.GetID() == 1
+    assert unit_type.GetName() == "Peasants"
     assert unit_type.GetAttackDice() == 2
     assert unit_type.GetAttackModyfire() == 1
     assert unit_type.GetDefenseDice() == 2

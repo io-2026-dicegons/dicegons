@@ -113,10 +113,11 @@ classDiagram
 
     class Typ_Jednostki{
         int ID_Typu_Jednostki
+        -string name
         int Atak_Kostka
         int Atak_Modifier
         int Obrona_Kostka
-        int OBrona_Modifier
+        int Obrona_Modifier
         int Max_Stos
         int Price
         int Max_Obronny_Rzut
@@ -125,6 +126,7 @@ classDiagram
         int Min_Atakujacy_Rzut
 
         +GetID()
+        +GetName() string
         +GetAttackDice()
         +GetAttackModifier()
         +GetDefenseDice()
