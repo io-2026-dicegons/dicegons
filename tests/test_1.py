@@ -5,9 +5,9 @@ def unit_type():
     return UnitType(
         ID_Typu_Jednostki=1,
         name="Peasants",
-        Atak_Kostka=2,
+        Atak_Kostka=6,
         Atak_Modifier=1,
-        Obrona_Kostka=2,
+        Obrona_Kostka=6,
         Obrona_Modifier=1,
         Max_Stos=10,
         Price=100
@@ -60,7 +60,7 @@ def province(player, army):
         ID_Prowincji=1,
         ID_Player=player,
         ID_Army=army,
-        ID_Terenu=Teren("Plains", 1),
+        ID_Terenu=Teren("Plains", 0),
         Budynki=[],
         Sąsiedzi=[],
         Hex=[]
@@ -74,12 +74,14 @@ def province(player, army):
 def test_unit_type_getters(unit_type):
     assert unit_type.GetID() == 1
     assert unit_type.GetName() == "Peasants"
-    assert unit_type.GetAttackDice() == 2
+    assert unit_type.GetAttackDice() == 6
     assert unit_type.GetAttackModyfire() == 1
-    assert unit_type.GetDefenseDice() == 2
+    assert unit_type.GetDefenseDice() == 6
     assert unit_type.GetDefenseModyfire() == 1
     assert unit_type.GetMaxQuantity() == 10
     assert unit_type.GetPrice() == 100
+    assert unit_type.GetMaxRoll() == 6
+    assert unit_type.GetMinRoll() == 1
 
 
 # --- Oddział ---
@@ -118,6 +120,17 @@ def test_province_owner(province, player):
 
 def test_province_army(province, army):
     assert province.GetArmy() == army
+
+def test_get_building_modifier(province):
+    building = province.getBuilding()
+    
+    assert building.getBuildingModifier() == 0
+
+def test_get_terrain_modifier(province):
+    terrain = province.getTerrain()
+
+    assert terrain.getTerrainModifier() == 1
+
 
 
 def test_province_hex_list(province):
@@ -169,3 +182,72 @@ def test_attack_result():
     result = game.Attack( from_province, to_province )
 
     assert result == 1
+
+
+# --- AI stuff ---
+
+def test_get_squad_mean(squad):
+
+    if squad == None:
+        assert 0
+    
+    squadType = squad.GetUnitType()
+    attackDice = squadType.GetAttackDice()
+    count = squad.GetQuantity()
+    maxRoll = squadType.GetMaxAttackRoll()
+    minRoll = squadType.GetMinAttackRoll()
+    modifier = squadType.GetAttackModifier()
+
+    mean = ((max(1 + modifier, minRoll) + min(attackDice + modifier, maxRoll))/2)*count #wzorek
+
+    assert mean == 20
+
+def test_get_army_mean(army):
+    if army == None:
+        assert 0
+
+    squadOne = army.GetFirstSquad()
+    squadTwo = army.GetSecondSquad()
+    count = army.getSquadCount()
+
+    mean = (squadOne.GetSquadMean() + squadTwo.GetSquadMean()) / count
+
+    assert mean == 20
+
+def test_get_army_defence(province):
+
+    defenderArmy = province.GetArmy()
+    provinceModifier = province.GetModifier()
+    building = province.GetBuilding()
+
+    if building == None:
+        buildingModifier = 0
+    else:
+        buildingModifier = building.GetModifier()
+    
+    armyCount = defenderArmy.GetSquadCount()
+    squadOne = defenderArmy.GetFirstSquad()
+    squadTwo = defenderArmy.GetSecondSquad()
+
+    firstSquadType = squadOne.GetUnitType()
+    secondSquadType = squadTwo.GetUnitType()
+
+    firstDefenceDice = firstSquadType.GetDefenceDice()
+    firstCount = squadOne.GetQuantity()
+    firstMaxRoll = firstSquadType.GetMaxDefenceRoll()
+    firstMinRoll = firstSquadType.GetMinDefenceRoll()
+    
+    secondDefenceDice = secondSquadType.GetDefenceDice()
+    secondCount = squadTwo.GetQuantity()
+    secondMaxRoll = secondSquadType.GetMaxDefenceRoll()
+    secondMinRoll = secondSquadType.GetMinDefenceRoll()    
+
+
+    modifier = provinceModifier + buildingModifier
+
+    meanSquadOne = ((max(1 + modifier, firstMinRoll) + min(firstDefenceDice + modifier, firstMaxRoll))/2)*firstCount 
+    meanSqudTwo = ((max(1 + modifier, secondMinRoll) + min(secondDefenceDice + modifier, secondMaxRoll))/2)*secondCount 
+
+    mean = (meanSquadOne + meanSqudTwo)/armyCount
+
+    assert mean == 20
