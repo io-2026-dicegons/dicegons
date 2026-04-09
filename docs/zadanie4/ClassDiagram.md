@@ -22,6 +22,9 @@ classDiagram
     ControlUI "1" <|-- "1" Main_Game
     ControlUI "1" <|-- "1" Ai
     Ai "1" <|-- "1" Main_Game
+    ResourceManager "1" --> "*" Teren
+    ResourceManager "1" --> "*" Budynki
+    ResourceManager "1" --> "*" Typ_Jednostki
     
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
 
@@ -171,5 +174,23 @@ classDiagram
         int y
     }
 
+    note for ResourceManager "ResourceManager is responsible for loading units/terrains/building definitions from appropriate files. Singleton"
 
+    class ResourceManager{
+        List~Budynki~ building_types
+        List~Teren~ terrain_types
+        List~Typ_Jednostki~ unit_types
+        
+        +load_definitions()
+        -load_unit_types()
+        -load_building_types()
+        -load_terrain_types()
+        +get_unit_types() List~Typ_Jednostki~
+        +get_terrain_types() List~Teren~
+        +get_building_types() List~Budynki~
+        +get_unit_type_by_id(int id) Typ_Jednostki
+        +get_building_type_by_id(int id) Budynki       
+        +get_terrain_type_by_id(int id) Teren
+    }
+    
 ```
