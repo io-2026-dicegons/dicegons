@@ -119,6 +119,8 @@ classDiagram
         int OBrona_Modifier
         int Max_Stos
         int Price
+        int Max_Rzut
+        int Min_Rzut
 
         +GetID()
         +GetAttackDice()
