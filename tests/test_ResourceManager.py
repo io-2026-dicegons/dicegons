@@ -3,6 +3,7 @@ import pytest
 from resourceManager import ResourceManager
 from pathlib import Path
 
+
 def test_load_single_unit (tmp_path):
     file = tmp_path / "units.json"
 
@@ -29,12 +30,13 @@ def test_load_single_unit (tmp_path):
 
     rm = ResourceManager()
     rm.load_unit_types(file)
-    assert rm.get_unit_types() != None
+    assert rm.get_unit_types() != None, "Expected at least some units loaded - get_unit_types() should not return None"
 
-    assert len(rm.get_unit_types()) == 1
+    assert len(rm.get_unit_types()) == 1, "Expected exactly one unit loaded" 
     loaded_unit = rm.get_unit_by_id(1)
     
-    assert loaded_unit.GetName() == "Peasant"
+    msg = "loaded unit have incorrect values"
+    assert loaded_unit.GetName() == "Peasant", msg
     assert loaded_unit.GetID() == 1
     assert loaded_unit.GetAttackDice() == 2
     assert loaded_unit.GetAttackModifier() == 0
@@ -86,9 +88,10 @@ def test_load_several_units (tmp_path):
     rm = ResourceManager()
     rm.load_unit_types(file)
     pass
-    assert rm.get_unit_types() != None
-    assert len(rm.get_unit_types()) == 2
+    assert rm.get_unit_types() != None, "Expected at least some units loaded - get_unit_types() should not return None"
+    assert len(rm.get_unit_types()) == 2, "Expected exactly 2 units loaded" 
     
+    msg = "loaded unit have incorrect values"
     loaded_unit = rm.get_unit_by_id(2)
     assert loaded_unit.GetName() == "Peasant"
     assert loaded_unit.GetID() == 1
@@ -136,9 +139,10 @@ def test_load_single_building (tmp_path):
 
     rm = ResourceManager()
     rm.load_building_types(file)
-    assert rm.get_building_types() != None
+    msg = "Expected at least some buildings loaded - get_building_types() should not return None"
+    assert rm.get_building_types() != None, msg
 
-    assert len(rm.get_building_types()) == 1
+    assert len(rm.get_building_types()) == 1, "Expected exactly 1 building loaded"
     
     loaded_bulding = rm.get_building_types()[0]
     
@@ -161,9 +165,10 @@ def test_load_single_terrain (tmp_path):
 
     rm = ResourceManager()
     rm.load_terrain_types(file)
-    assert rm.get_terrain_types() != None
+    msg = "Expected at least some terrains' definitions loaded - get_terrain_types() should not return None"
+    assert rm.get_terrain_types() != None, msg
 
-    assert len(rm.get_terrain_types()) == 1
+    assert len(rm.get_terrain_types()) == 1, "Expected 1 terrain type loaded"
     
     loaded_terrain = rm.get_terrain_types()[0]
     
