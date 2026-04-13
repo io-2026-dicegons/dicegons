@@ -1,0 +1,17 @@
+{
+    "terrain_types":
+    [
+        {
+            "terrain_name": "Plains",
+            "defence_modifier": 0,
+            "income": 1,
+            "color": [0, 255, 0, 100]
+        },
+        {
+            "terrain_name": "Mountains",
+            "defence_modifier": 2,
+            "income": 0,
+            "color": [0, 0, 255, 100]
+        }
+    ]
+}
