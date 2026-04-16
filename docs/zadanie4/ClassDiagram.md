@@ -7,7 +7,7 @@ classDiagram
     Odział "1" <|-- "1" Typ_Jednostki
     Armia "1" <|-- "2" Odział
     Prowincja "1" <|-- "1" Armia
-    Prowincja "1" <|-- "1" Teren
+    Prowincja "1" <|-- "1" TerrainType
     Prowincja "1" <|-- "1" Budynki
     Prowincja "1" <|-- "*" Hexes
     Mapa "1" <|-- "*" Prowincja
@@ -22,7 +22,7 @@ classDiagram
     ControlUI "1" <|-- "1" Main_Game
     ControlUI "1" <|-- "1" Ai
     Ai "1" <|-- "1" Main_Game
-    ResourceManager "1" --> "*" Teren
+    ResourceManager "1" --> "*" TerrainType
     ResourceManager "1" --> "*" Budynki
     ResourceManager "1" --> "*" Typ_Jednostki
     
@@ -159,11 +159,14 @@ classDiagram
         +GetArmyAttackMean()
     }
 
-    class Teren{
-        string Nazwa_terenu
-        int Modifier
+    class TerrainType{
+        terrain_name: string
+        id: int
+        defence_modifier: int
+        income_modifier: int
+        color: List<int>
     }
-
+    
     class Budynki{
         string Nazwa_Budynku
         int Modifier
