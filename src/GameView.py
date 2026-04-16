@@ -1,6 +1,7 @@
 import pygame
 import sys
-import math 
+import math
+import json 
 
 
 scale = 2
@@ -23,6 +24,11 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("IOIOIOIO")
 
 finView = pygame.transform.smoothscale(gameWindow, viewSize)
+
+with open("scenario_one.json") as f:
+    data = json.load(f)
+
+players = data["players"]
 
 
 def draw_hex(surface, color, width, position ):
@@ -72,9 +78,6 @@ def draw_map(surface, hex_list, color, width):
         
         draw_hex( surface, color, width, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
 
-
-
-
 start_draw_pos = (proportions*hex_size, hex_size)
 
 background = pygame.Surface(screenSize, pygame.SRCALPHA) 
@@ -89,10 +92,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    player_one_hexes = [(0, 0), (0, 1), (1, 0), (1, 2), (2, 2), (1, 1), (2, 1)] 
+
+    draw_full_map(viewSurface, "blue", 0)
+    player_one_hexes = players[0]["hexList"]
     draw_map(viewSurface, player_one_hexes, "white", 0)
 
-
+    
     draw_full_map(  viewSurface, "Black", 1)
 
 
