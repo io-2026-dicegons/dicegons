@@ -28,8 +28,36 @@ def draw_hex(surface, color, width, position ):
 
     pygame.draw.polygon(surface, color, points, width)
     
-def draw_map(surface):
-    pass
+def draw_full_map(surface, color, width):
+    i = 0
+    j = 0
+    for i in range(hex_number_x):
+        for j in range(hex_number_y):
+            w = math.sqrt(3) * hex_size
+            h = 2 * hex_size
+
+            x_offset = w * i
+            y_offset = 1.5 * hex_size * j
+
+            if j % 2 == 1:
+                x_offset += w / 2
+            
+            draw_hex( surface, color, width, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
+
+def draw_map(surface, hex_list, color, width):
+    i,j = (0, 0)
+    for i,j in hex_list:
+        w = math.sqrt(3) * hex_size
+        h = 2 * hex_size
+
+        x_offset = w * i
+        y_offset = 1.5 * hex_size * j
+
+        if j % 2 == 1:
+            x_offset += w / 2
+        
+        draw_hex( surface, color, width, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
+
 
 
 
@@ -47,43 +75,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # for i in range(int(screenSize[0] / (proportions * hex_size))):
-    #     for j in range(int(screenSize[1] / ( 2 * hex_size))):
-    for i in range(hex_number_x):
-        for j in range(hex_number_y):
-            w = math.sqrt(3) * hex_size
-            h = 2 * hex_size
+    player_one_hexes = [(0, 0), (0, 1), (1, 0), (1, 2), (2, 2), (1, 1), (2, 1)] 
+    draw_map(gameWindow, player_one_hexes, "white", 0)
 
-            x_offset = w * i
-            y_offset = 1.5 * hex_size * j
-
-            if j % 2 == 1:
-                x_offset += w / 2
-            
-
-            color = "white"
-            player_one_hexes = [(0, 0), (0, 1), (1, 0), (1, 2), (2, 2), (1, 1), (2, 1)] 
-            if(i, j) in player_one_hexes:
-                color = "red"
-            else:
-                color = "white"
-            draw_hex( gameWindow, color, 0, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
-
-            
-    i = 0
-    j = 0
-    for i in range(hex_number_x):
-        for j in range(hex_number_y):
-            w = math.sqrt(3) * hex_size
-            h = 2 * hex_size
-
-            x_offset = w * i
-            y_offset = 1.5 * hex_size * j
-
-            if j % 2 == 1:
-                x_offset += w / 2
-            
-            draw_hex( gameWindow, "black", 1, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
+    draw_full_map( gameWindow, "Black", 1)
 
     pygame.display.update()
     clock.tick(60)
