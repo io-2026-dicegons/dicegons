@@ -2,15 +2,27 @@ import pygame
 import sys
 import math 
 
-hex_number_x = 30
-hex_number_y = 20
-hex_size = 16
+
+scale = 2
+hex_unscaled_number_x = 30
+hex_unscaled_number_y = 20
+hex_unscaled_size = 16
 proportions = math.sqrt(3) / 2
+
+hex_number_x = hex_unscaled_number_x 
+hex_number_y = hex_unscaled_number_y 
+hex_size = hex_unscaled_size * scale
+
+viewSize = (hex_unscaled_number_x * 2 * proportions * hex_unscaled_size + hex_unscaled_size, 3/2 * hex_unscaled_number_y * hex_unscaled_size + 1/2*hex_unscaled_size)
 screenSize = (hex_number_x * 2 * proportions * hex_size + hex_size, 3/2 * hex_number_y * hex_size + 1/2*hex_size)
 #screenSize = (1000, 1000)
-gameWindow = pygame.display.set_mode(screenSize)
+gameWindow = pygame.display.set_mode(viewSize)
+viewSurface = pygame.Surface(screenSize)
+
 clock = pygame.time.Clock()
 pygame.display.set_caption("IOIOIOIO")
+
+finView = pygame.transform.smoothscale(gameWindow, viewSize)
 
 
 def draw_hex(surface, color, width, position ):
@@ -28,6 +40,8 @@ def draw_hex(surface, color, width, position ):
 
     pygame.draw.polygon(surface, color, points, width)
     
+
+
 def draw_full_map(surface, color, width):
     i = 0
     j = 0
@@ -69,17 +83,21 @@ background.fill("grey")
 running = True
 while running:
     
-    gameWindow.blit(background, (0, 0))
+    viewSurface.blit(background, (0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     player_one_hexes = [(0, 0), (0, 1), (1, 0), (1, 2), (2, 2), (1, 1), (2, 1)] 
-    draw_map(gameWindow, player_one_hexes, "white", 0)
+    draw_map(viewSurface, player_one_hexes, "white", 0)
 
-    draw_full_map( gameWindow, "Black", 1)
 
+    draw_full_map(  viewSurface, "Black", 1)
+
+
+    scaled = pygame.transform.smoothscale(viewSurface, viewSize)
+    gameWindow.blit(scaled, (0, 0))
     pygame.display.update()
     clock.tick(60)
     
