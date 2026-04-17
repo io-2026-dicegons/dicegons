@@ -3,6 +3,8 @@ import pytest
 from resourceManager import ResourceManager
 from pathlib import Path
 
+from terrain import TerrainType
+from building import Building
 
 def test_load_single_unit (tmp_path):
     file = tmp_path / "units.json"
@@ -130,13 +132,15 @@ def test_load_single_building (tmp_path):
     {
       "building_types": [
         {
-          "Nazwa_Budynku": "TestowyBudynek",
-          "Modifier": 2,
+          "name": "TestBuilding",
+          "id": 0,
+          "defence_modifier": 1,
+          "income_modifier": 2
         }
       ]
     }
     """)
-
+    
     rm = ResourceManager()
     rm.load_building_types(file)
     msg = "Expected at least some buildings loaded - get_building_types() should not return None"
@@ -146,8 +150,10 @@ def test_load_single_building (tmp_path):
     
     loaded_bulding = rm.get_building_types()[0]
     
-    assert loaded_bulding.Nazwa_Budynku() == "TestowyBudynek"
-    assert loaded_bulding.Modifier == 2
+    assert loaded_bulding.name == "TestBuilding"
+    assert loaded_bulding.id == 0
+    assert loaded_bulding.defence_modifier == 1
+    assert loaded_bulding.income_modifier == 2
     
 def test_load_single_terrain (tmp_path):
     file = tmp_path / "terrain.json"
@@ -156,8 +162,11 @@ def test_load_single_terrain (tmp_path):
     {
       "terrain_types": [
         {
-          "Nazwa_terenu": "Pustynia",
-          "Modifier": 2,
+            "terrain_name": "Desert",
+            "id": 1,
+            "defence_modifier": 2,
+            "income_modifier": 0,
+            "color": [0, 255, 0, 100]
         }
       ]
     }
@@ -170,10 +179,56 @@ def test_load_single_terrain (tmp_path):
 
     assert len(rm.get_terrain_types()) == 1, "Expected 1 terrain type loaded"
     
-    loaded_terrain = rm.get_terrain_types()[0]
+    loaded_terrain = rm.get_terrain_types()[1]
+    assert loaded_terrain.terrain_name == "Desert"
+    assert loaded_terrain.id == 1
+    assert loaded_terrain.defence_modifier == 2
+    assert loaded_terrain.income_modifier == 0
     
-    assert loaded_terrain.Nazwa_terenu() == "Pustynia"
-    assert loaded_terrain.Modifier == 2
+def test_get_terrain_by_id (tmp_path):
+    file = tmp_path / "terrain.json"
+
+    file.write_text("""
+    {
+      "terrain_types": [
+        {
+            "terrain_name": "Desert",
+            "id": 1,
+            "defence_modifier": 2,
+            "income_modifier": 0,
+            "color": [0, 255, 0, 100]
+        },
+        {
+            "terrain_name": "Forest",
+            "id": 3,
+            "defence_modifier": 1,
+            "income_modifier": 1,
+            "color": [0, 255, 0, 100]
+        }
+      ]
+    }
+    """)
+
+    rm = ResourceManager()
+    rm.load_terrain_types(file)
+    
+    loaded_terrain = rm.get_terrain_by_id(1)
+    assert loaded_terrain.terrain_name == "Desert"
+    assert loaded_terrain.id == 1
+    assert loaded_terrain.defence_modifier == 2
+    assert loaded_terrain.income_modifier == 0    
+    
+    # re-work test
+    loaded_terrain = rm.get_terrain_by_id(3)
+    assert loaded_terrain.terrain_name == "Forest"
+    assert loaded_terrain.id == 3
+    assert loaded_terrain.defence_modifier == 1
+    assert loaded_terrain.income_modifier == 1   
+    
+
+    
+
+
     
     
     

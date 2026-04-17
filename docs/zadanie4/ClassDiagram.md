@@ -8,7 +8,7 @@ classDiagram
     Armia "1" <|-- "2" Odział
     Prowincja "1" <|-- "1" Armia
     Prowincja "1" <|-- "1" TerrainType
-    Prowincja "1" <|-- "1" Budynki
+    Prowincja "1" <|-- "1" Building
     Prowincja "1" <|-- "*" Hexes
     Mapa "1" <|-- "*" Prowincja
     Main_Game "1" <|-- "1" Mapa
@@ -23,7 +23,7 @@ classDiagram
     ControlUI "1" <|-- "1" Ai
     Ai "1" <|-- "1" Main_Game
     ResourceManager "1" --> "*" TerrainType
-    ResourceManager "1" --> "*" Budynki
+    ResourceManager "1" --> "*" Building
     ResourceManager "1" --> "*" Typ_Jednostki
     
     note for Armia "Armia składa się z 2 odziałow a odział składa się z grupy danych jednostek"
@@ -167,9 +167,11 @@ classDiagram
         color: List<int>
     }
     
-    class Budynki{
-        string Nazwa_Budynku
-        int Modifier
+    class Building{
+        name: string
+        id: int
+        defence_modifier: int
+        income_modifier: int
     }
 
     class Hexes{
@@ -180,8 +182,8 @@ classDiagram
     note for ResourceManager "ResourceManager is responsible for loading units/terrains/building definitions from appropriate files. Singleton"
 
     class ResourceManager{
-        List~Budynki~ building_types
-        List~Teren~ terrain_types
+        List~Building~ building_types
+        List~TerrainType~ terrain_types
         List~Typ_Jednostki~ unit_types
         
         +load_definitions()
@@ -189,11 +191,11 @@ classDiagram
         -load_building_types()
         -load_terrain_types()
         +get_unit_types() List~Typ_Jednostki~
-        +get_terrain_types() List~Teren~
-        +get_building_types() List~Budynki~
+        +get_terrain_types() List~TerrainType~
+        +get_building_types() List~Building~
         +get_unit_type_by_id(int id) Typ_Jednostki
-        +get_building_type_by_id(int id) Budynki       
-        +get_terrain_type_by_id(int id) Teren
+        +get_building_type_by_id(int id) Building       
+        +get_terrain_type_by_id(int id) TerrainType
     }
     
 ```
