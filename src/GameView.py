@@ -9,10 +9,13 @@ import json
 # statystyki hexow
 scale = 2
 hexScale = 1
-hex_unscaled_number_x = 30 * hexScale
-hex_unscaled_number_y = 20 * hexScale
+hex_unscaled_number_x = int(30 * hexScale)
+hex_unscaled_number_y = int(20 * hexScale)
 hex_unscaled_size = 16 / hexScale
 proportions = math.sqrt(3) / 2
+
+waterColor = [38, 64, 171]
+# sandColor = [195, 172, 126]
 
 # tutaj jest system od skalowania mapy bo bez tego to strasznie spixelizowane bylo
 hex_number_x = hex_unscaled_number_x 
@@ -31,13 +34,16 @@ viewSurface = pygame.Surface(screenSize)
 clock = pygame.time.Clock()
 pygame.display.set_caption("IOIOIOIO")
 
-finView = pygame.transform.smoothscale(gameWindow, viewSize)
-
+# wczytywanie bazy danych
 with open("scenario_one.json") as f:
-    data = json.load(f)
+    scenario_data = json.load(f)
 
-provinces = data["provinces"]
+provinces = scenario_data["provinces"]
 
+with open("terrain_types.json") as f:
+    terrain_data = json.load(f)
+
+terrain = terrain_data["terrain_types"]
 
 def draw_hex(surface, color, width, position ):
     
@@ -151,6 +157,15 @@ def draw_map(surface, hex_list, color, width):  #mapa z listy
         
         draw_hex( surface, color, width, (start_draw_pos[0] + x_offset, start_draw_pos[1] + y_offset))
 
+def draw_province(surface, province):
+    province_hexes = province["hexList"]
+    terrain_id = province["terrain_ID"]
+
+    color = terrain[terrain_id]["color"]
+
+    draw_map(surface, province_hexes, color, 0)
+    draw_border_map(surface, province_hexes, "black", 2 * scale)
+
 #pygame stuff v2
 start_draw_pos = (proportions*hex_size, hex_size)
 
@@ -160,34 +175,25 @@ background.fill("grey")
 running = True
 while running:
     
-
     viewSurface.blit(background, (0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     # rysuje cala mape poza jako wode 
-    draw_full_map(viewSurface, "blue", 0)
+    draw_full_map(viewSurface, waterColor, 0)
 
-    #a tutaj bierze z scenariusza prowincje i je maluje na dany kolor (wczytywanie typow terenu zrobie potem)
-    province_zero_hexes = provinces[0]["hexList"]
-    draw_map(viewSurface, province_zero_hexes, "white", 0)
-    province_one_hexes = provinces[1]["hexList"]
-    draw_map(viewSurface, province_one_hexes, "red", 0)
-    province_two_hexes = provinces[2]["hexList"]
-    draw_map(viewSurface, province_two_hexes, "green", 0)
+    #tworzy prowincje
+    for province in provinces:
+        draw_province(viewSurface, province)
+
+
     
-
-    # draw_full_map(  viewSurface, "Black", 1)
-    #granice prowincji 
-    draw_border_map(viewSurface, province_zero_hexes, "black", 2 * scale)
-    draw_border_map(viewSurface, province_one_hexes, "black", 2 * scale)
-    draw_border_map(viewSurface, province_two_hexes, "black", 2 * scale)
-
     scaled = pygame.transform.smoothscale(viewSurface, viewSize)
     gameWindow.blit(scaled, (0, 0))
     pygame.display.update()
     clock.tick(60)
     
+
 pygame.quit()
 
