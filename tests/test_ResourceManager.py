@@ -1,10 +1,10 @@
 import pytest
 
-from resourceManager import ResourceManager
 from pathlib import Path
 
-from terrain import TerrainType
-from building import Building
+from game.resourceManager import ResourceManager
+from game.terrain import TerrainType
+from game.building import Building
 
 def test_load_single_unit (tmp_path):
     file = tmp_path / "units.json"

@@ -57,7 +57,7 @@ class GameWindowClass:
         self.provinces = scenario_data["provinces"]
         # print(self.provinces)
 
-        with open("terrain_types.json") as f:
+        with open("game/terrain_types.json") as f:
             terrain_data = json.load(f)
 
         self.terrain = terrain_data["terrain_types"]

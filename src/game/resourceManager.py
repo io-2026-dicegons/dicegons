@@ -1,9 +1,9 @@
 from pathlib import Path
 import json 
 
-from terrain import TerrainType
-from building import Building
-from unit import UnitType
+from game.terrain import TerrainType
+from game.building import Building
+from game.unit import UnitType
 
 class ResourceManager:
     def __init__(self):
