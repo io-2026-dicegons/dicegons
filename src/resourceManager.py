@@ -3,6 +3,7 @@ import json
 
 from terrain import TerrainType
 from building import Building
+from unit import UnitType
 
 class ResourceManager:
     def __init__(self):
@@ -15,49 +16,99 @@ class ResourceManager:
         # load units, building, terrain types from appropriate files
         self.load_terrain_types(Path("terrain_types.json"))
         self.load_building_types(Path("building_types.json"))
-        self.load_unit_types(Path("terrain_types.json"))
-
+        self.load_unit_types(Path("units.json"))
+        # filenames should be configurable
         return
 
     def load_unit_types(self, file_path):
-        pass
+        try:
+            with open(file_path, 'r') as fi:
+                try:
+                    data = json.load(fi)
+                except json.JSONDecodeError:
+                    print ("Invalid JSON within file describing units")
+                    self.unit_types = { UnitType() }
+                    return
+        
+            try:
+                for item in data["unit_types"]:
+                    current = UnitType(
+                        id_unit_type = item["ID_Typu_Jednostki"],
+                        name = item["name"],
+                        attack_dice = item["Atak_Kostka"],
+                        attack_modifier = item["Atak_Modifier"],
+                        defensive_dice = item["Obrona_Kostka"],
+                        defense_modifier = item["Obrona_Modifier"],
+                        max_quantity = item["Max_Stos"],
+                        price = item["Price"],
+                        max_defensive_result = item["Max_Obronny_Rzut"],
+                        min_defensive_result = item["Min_Obronny_Rzut"],
+                        max_offensive_result = item["Max_Atakujacy_Rzut"],
+                        min_offensive_result = item["Min_Atakujacy_Rzut"]
+                    )
+                    self.unit_types[current.id_unit_type] = current
+            except KeyError:
+                self.unit_types = { UnitType() }   
+                
+        except (FileNotFoundError, PermissionError) as exc:
+            # todo different warning log
+            print ("File with unit types definitions missing or unreadable. Loading placeholder unit")
+            self.unit_types = { UnitType() }
+        return
         
     def load_building_types(self, file_path):
         
-        with open(file_path, 'r') as fi:
-            data = json.load(fi)
-        
         try:
-            for item in data["building_types"]:
-                current = Building(
-                    name = item["name"],
-                    id = item["id"],
-                    defence_modifier = item["defence_modifier"],
-                    income_modifier = item["income_modifier"]
-                )
-                self.building_types[current.id] = current
-        except KeyError:
-            self.building_types = { Building() }        
-        pass
+            with open(file_path, 'r') as fi:
+                try:
+                    data = json.load(fi)
+                except json.JSONDecodeError:
+                    print ("Invalid JSON within file describing buildings")
+                    self.building_types = { Building() }
+                    return
+            try:
+                for item in data["building_types"]:
+                    current = Building(
+                        name = item["name"],
+                        id = item["id"],
+                        defence_modifier = item["defence_modifier"],
+                        income_modifier = item["income_modifier"]
+                    )
+                    self.building_types[current.id] = current
+            except KeyError:
+                self.building_types = { Building() }
+        except (FileNotFoundError, PermissionError) as exc:
+            print ("File with building types definitions missing or unreadable. Loading placeholder building with id0")
+            self.building_types = { Building() }
+        return
     
     def load_terrain_types(self, file_path):
-        with open(file_path, 'r') as fi:
-            data = json.load(fi)
         
         try:
-            # or maybe it should be simply dict from json?
-            for item in data["terrain_types"]:
-                current_terrain = TerrainType(
-                    name = item["terrain_name"],
-                    id = item["id"],
-                    defence_modifier = item["defence_modifier"],
-                    income_modifier = item["income_modifier"],
-                    color = item["color"]
-                )
-                self.terrain_types[current_terrain.id] = current_terrain
-        except KeyError:
-            self.terrain_types = { TerrainType() }
+            with open(file_path, 'r') as fi:                
+                try:
+                    data = json.load(fi)
+                except json.JSONDecodeError:
+                    print ("Invalid JSON within file describing terrain")
+                    self.terrain_types = { TerrainType() }
+                    return
+            try:
+                # or maybe it should be simply dict from json?
+                for item in data["terrain_types"]:
+                    current_terrain = TerrainType(
+                        name = item["terrain_name"],
+                        id = item["id"],
+                        defence_modifier = item["defence_modifier"],
+                        income_modifier = item["income_modifier"],
+                        color = item["color"]
+                    )
+                    self.terrain_types[current_terrain.id] = current_terrain
+            except KeyError:
+                self.terrain_types = { TerrainType() }
         
+        except (FileNotFoundError, PermissionError) as exc:
+            print ("File with terrain types definitions missing or unreadable. Loading placeholder terrain with id0")
+            self.terrain_types = { TerrainType() }
         return
                     
     def get_unit_types(self):
@@ -66,8 +117,8 @@ class ResourceManager:
     def get_unit_by_id(self, unit_id):
         if unit_id in self.unit_types:
             return self.unit_types[unit_id]
-        #else:
-            #return UnitType()
+        else:
+            return UnitType()
         pass
     
     def get_building_types(self):
@@ -86,8 +137,6 @@ class ResourceManager:
         if t_id in self.terrain_types:
             return self.terrain_types[t_id]
         else:
-            # should we raise hell?
-            # for now returns default terrain
-            defafult_terrain = TerrainType()
-            return defafult_terrain
+            default_terrain = TerrainType()
+            return default_terrain
 

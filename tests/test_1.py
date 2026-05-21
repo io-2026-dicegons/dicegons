@@ -1,16 +1,18 @@
 import pytest
 
+from unit import UnitType
+
 @pytest.fixture
 def unit_type():
     return UnitType(
-        ID_Typu_Jednostki=1,
+        id_unit_type=1,
         name="Peasants",
-        Atak_Kostka=6,
-        Atak_Modifier=1,
-        Obrona_Kostka=6,
-        Obrona_Modifier=1,
-        Max_Stos=10,
-        Price=100
+        attack_dice=6,
+        attack_modifier=1,
+        defensive_dice=6,
+        defense_modifier=1,
+        max_quantity=10,
+        price=100
     )
 
 
@@ -75,13 +77,15 @@ def test_unit_type_getters(unit_type):
     assert unit_type.GetID() == 1
     assert unit_type.GetName() == "Peasants"
     assert unit_type.GetAttackDice() == 6
-    assert unit_type.GetAttackModyfire() == 1
+    assert unit_type.GetAttackModifier() == 1
     assert unit_type.GetDefenseDice() == 6
-    assert unit_type.GetDefenseModyfire() == 1
+    assert unit_type.GetDefenseModifier() == 1
     assert unit_type.GetMaxQuantity() == 10
     assert unit_type.GetPrice() == 100
-    assert unit_type.GetMaxRoll() == 6
-    assert unit_type.GetMinRoll() == 1
+    assert unit_type.GetMaxOffensiveRoll() == 7
+    assert unit_type.GetMinOffensiveRoll() == 2
+    assert unit_type.GetMaxDefensiveRoll() == 7
+    assert unit_type.GetMinDefensiveRoll() == 2
 
 
 # --- Oddział ---

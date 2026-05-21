@@ -38,7 +38,7 @@ def test_load_single_unit (tmp_path):
     loaded_unit = rm.get_unit_by_id(1)
     
     msg = "loaded unit have incorrect values"
-    assert loaded_unit.GetName() == "Peasant", msg
+    assert loaded_unit.GetName() == "Peasant"
     assert loaded_unit.GetID() == 1
     assert loaded_unit.GetAttackDice() == 2
     assert loaded_unit.GetAttackModifier() == 0
@@ -89,12 +89,13 @@ def test_load_several_units (tmp_path):
 
     rm = ResourceManager()
     rm.load_unit_types(file)
-    pass
     assert rm.get_unit_types() != None, "Expected at least some units loaded - get_unit_types() should not return None"
-    assert len(rm.get_unit_types()) == 2, "Expected exactly 2 units loaded" 
+    
+    t = len(rm.get_unit_types())
+    assert t == 2, "Expected exactly 2 units loaded; got " + str(t)
     
     msg = "loaded unit have incorrect values"
-    loaded_unit = rm.get_unit_by_id(2)
+    loaded_unit = rm.get_unit_by_id(1)
     assert loaded_unit.GetName() == "Peasant"
     assert loaded_unit.GetID() == 1
     assert loaded_unit.GetAttackDice() == 3
@@ -118,12 +119,49 @@ def test_load_several_units (tmp_path):
 
 def test_load_empty_unit_file (tmp_path):
     file = tmp_path / "units22.json"
+    file.write_text(" ")
     rm = ResourceManager()
     rm.load_unit_types(file)
     # maybe it should be treated more seriously
     assert rm.get_unit_types() != None
-    assert len(rm.get_unit_types()) == 0
+    assert len(rm.get_unit_types()) == 1
     
+def test_load_not_existing_unit_file (tmp_path):
+    file = tmp_path / "units22.json"
+    rm = ResourceManager()
+    rm.load_unit_types(file)
+    assert rm.get_unit_types() != None
+    assert len(rm.get_unit_types()) == 1
+         
+def test_load_empty_buildings_file (tmp_path):
+    file = tmp_path / "buildings22.json"
+    file.write_text(" ")
+    rm = ResourceManager()
+    rm.load_building_types(file)
+    assert rm.get_building_types() != None
+    assert len(rm.get_building_types()) == 1
+    
+def test_load_not_existing_buildings_file (tmp_path):
+    file = tmp_path / "buildings22.json"
+    rm = ResourceManager()
+    rm.load_building_types(file)
+    assert rm.get_building_types() != None
+    assert len(rm.get_building_types()) == 1
+
+def test_load_empty_terrain_file (tmp_path):
+    file = tmp_path / "terrain22.json"
+    file.write_text(" ")
+    rm = ResourceManager()
+    rm.load_terrain_types(file)
+    assert rm.get_terrain_types() != None
+    assert len(rm.get_terrain_types()) == 1
+    
+def test_load_not_existing_terrain_file (tmp_path):
+    file = tmp_path / "terrain22.json"
+    rm = ResourceManager()
+    rm.load_terrain_types(file)
+    assert rm.get_terrain_types() != None
+    assert len(rm.get_terrain_types()) == 1    
 
 def test_load_single_building (tmp_path):
     file = tmp_path / "buildings.json"
