@@ -18,31 +18,34 @@ class GameWindowClass:
         
             
         # statystyki hexow
-        self.scale = 2
-        hexScale = 1/2
+        self.scale = 1
+        hexScale = 2/3 # <--------------------------------------------------------------
         hex_unscaled_number_x = int(self.origin_X_hex_number * hexScale) #30
         hex_unscaled_number_y = int(self.origin_Y_hex_number * hexScale) #20
-        hex_unscaled_size = 16 / hexScale
+        hex_unscaled_size = hex_size / hexScale
         self.proportions = math.sqrt(3) / 2
 
         self.waterColor = [38, 64, 171]
+
+        self.glow = None
+        self.glow_color = [150, 150, 150, 10]
 
         # sandColor = [195, 172, 126]
 
         # tutaj jest system od skalowania mapy bo bez tego to strasznie spixelizowane bylo
         self.hex_number_x = hex_unscaled_number_x 
         self.hex_number_y = hex_unscaled_number_y 
-        # self.hex_size = hex_unscaled_size * self.scale # <------------------------------------------------------------------
+        self.hex_size = hex_unscaled_size * self.scale # <------------------------------------------------------------------
 
         self.viewSize = (hex_unscaled_number_x * 2 * self.proportions * hex_unscaled_size + hex_unscaled_size, 3/2 * hex_unscaled_number_y * hex_unscaled_size + 1/2*hex_unscaled_size)
         self.screenSize = (self.hex_number_x * 2 * self.proportions * self.hex_size + self.hex_size, 3/2 * self.hex_number_y * self.hex_size + 1/2*self.hex_size)
-        #self.screenSize = (1000, 1000)
+        # self.screenSize = (1000, 1000)
 
-        self.start_draw_pos = (self.startX + self.proportions*self.hex_size , self.startY+ self.hex_size)
+        self.start_draw_pos = (self.startX + self.proportions * self.hex_size , self.startY + self.hex_size)
 
         #pygamestuff
         self.gameWindow = pygame.display.set_mode(self.viewSize)
-        self.viewSurface = pygame.Surface(self.screenSize)
+        self.viewSurface = pygame.Surface(self.screenSize, pygame.SRCALPHA)
 
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("IOIOIOIO")
@@ -52,6 +55,7 @@ class GameWindowClass:
             scenario_data = json.load(f)
 
         self.provinces = scenario_data["provinces"]
+        # print(self.provinces)
 
         with open("terrain_types.json") as f:
             terrain_data = json.load(f)
@@ -343,17 +347,46 @@ class GameWindowClass:
         color = self.terrain[terrain_id]["color"]
 
         self.draw_map(surface, province_hexes, color, 0)
-        self.draw_border_map(surface, province_hexes, "black", 2)
+        if(self.glow == province):
+            # print(color)
+            self.draw_map(surface, province_hexes, self.glow_color, 0)
+            
+        self.draw_border_map(surface, province_hexes, "black", int(self.hex_size/8))
+
         
+
+
     def draw_player_stuff(self, surface, player_provinces, color):
         for i in range(len(player_provinces)):
             self.draw_player_border(surface, player_provinces, i, color, 0, 1/4)
 
+    def pixel_to_hex(self, mouse_pos):
+        mx, my = mouse_pos
+
+        mx -= self.start_draw_pos[0]
+        my -= self.start_draw_pos[1]
+
+        w = math.sqrt(3) * self.hex_size
+        row_height = 1.5 * self.hex_size 
+
+        j = int(round(my / row_height))
+
+        if j % 2 == 1:
+            mx -= w / 2
+
+        i = int(round(mx / w))
+
+        return [i, j]
 
 
+    def get_clicked_province(self, mouse_pos):
+        clicked_hex = self.pixel_to_hex(mouse_pos)
 
-    #pygame stuff v2
+        for province in self.provinces:
+            if clicked_hex in province["hexList"]:
+                return province
 
+        return None
 
     def runGame(self):
         background = pygame.Surface(self.screenSize, pygame.SRCALPHA) 
@@ -361,11 +394,22 @@ class GameWindowClass:
 
         running = True
         while running:
+
+            self.viewSurface.blit(background, (self.startX, self.startY))
             
-            self.viewSurface.blit(background, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                if event.type == pygame.QUIT:
+                    running = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    province = self.get_clicked_province(event.pos)
+                
+                    if (province is not None):
+                        print("Province ID =", province["ID"])
+                        self.glow = province
+                    
 
             # rysuje cala mape poza jako wode 
             self.draw_full_map(self.viewSurface, self.waterColor, 0)
@@ -378,16 +422,16 @@ class GameWindowClass:
 
             test = [[0,0],[1,0],[1,1], [0,1]]
             test2 = [[2,2],[2,1], [2,3], [3,2], [1, 2]]
-            test3 = [[0,2], [0,3], [0,4], [1,4], [1, 3], [1, 5]]
+            test3 = [[0,2], [0,3], [0,4], [1,4], [1, 3]]
 
             player_provinces = [test, test2, test3]
 
-            self.draw_player_stuff(self.viewSurface, player_provinces, "red")
+            self.draw_player_stuff(self.viewSurface, player_provinces, (255, 0, 0, 255))
 
             test4 = [[[3,0], [4,0], [4,1], [4,2], [2, 0], [3,1]]]
             self.draw_player_stuff(self.viewSurface, test4, "green")
 
-            self.draw_building(self.viewSurface, "0", 3 , test)
+            self.draw_building(self.viewSurface, "l", 0 , test)
             self.draw_army(self.viewSurface, "U", 0, 13 , "P", 1, 4, test)
     
 
@@ -413,3 +457,5 @@ gameWindow = None
 
 game = GameWindowClass( gameWindow , 0, 0, 1, 16, 30, 20)
 game.runGame()
+
+# zaleznosc hexow od wielkosci okna a nie odwrotnie 
