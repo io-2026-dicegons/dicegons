@@ -1,0 +1,6 @@
+
+class Player:
+    def __init__(self, player_id, nick, gold=0):
+        self.player_id = player_id
+        self.nick = nick;
+        self.gold = gold;
