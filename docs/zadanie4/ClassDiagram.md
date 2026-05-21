@@ -11,17 +11,17 @@ classDiagram
     Prowincja "1" <|-- "1" Budynki
     Prowincja "1" <|-- "*" Hexes
     Mapa "1" <|-- "*" Prowincja
-    Main_Game "1" <|-- "1" Mapa
-    Main_Game "1" <|-- "*" Gracz
-    Main_Game "1" <|-- "1" Tura
+    GameController "1" <|-- "1" Mapa
+    GameController "1" <|-- "*" Gracz
+    GameController "1" <|-- "1" Tura
     Tura "1" <|-- "1" Faza
-    Main_Game "1" <|-- "1" Opis
+    GameController "1" <|-- "1" Opis
     Prowincja "1" <|-- "1" Gracz
     ControlUI "1" <|-- "1" DrawUI
-    DrawUI "1" <|-- "1" Main_Game
-    ControlUI "1" <|-- "1" Main_Game
+    DrawUI "1" <|-- "1" GameController
+    ControlUI "1" <|-- "1" GameController
     ControlUI "1" <|-- "1" Ai
-    Ai "1" <|-- "1" Main_Game
+    Ai "1" <|-- "1" GameController
     ResourceManager "1" --> "*" Teren
     ResourceManager "1" --> "*" Budynki
     ResourceManager "1" --> "*" Typ_Jednostki
@@ -50,7 +50,7 @@ classDiagram
         +DrawUnit()
     }
 
-    class Main_Game{
+    class GameController{
         list Player
         int Map_ID
         string Opis
