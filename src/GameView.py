@@ -3,7 +3,7 @@ import sys
 import math
 import json 
 #importy
-from game.resourceManager import ResourceManager
+from resourceManager import ResourceManager
 
 
 #komentarze sa po to bo mam wrazenier ze nie ogarne kodu sam zaraz a co dopiero wy

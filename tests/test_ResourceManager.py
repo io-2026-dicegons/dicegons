@@ -2,7 +2,7 @@ import pytest
 
 from pathlib import Path
 
-from game.resourceManager import ResourceManager
+from resourceManager import ResourceManager
 from game.terrain import TerrainType
 from game.building import Building
 
