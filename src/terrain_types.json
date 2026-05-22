@@ -2,36 +2,43 @@
     "terrain_types":
     [
         {
-            "terrain_name": "Plains",
+            "terrain_name": "Water",
             "id": 0,
+            "defence_modifier": 0,
+            "income_modifier": 0,
+            "color": [38, 64, 171]
+        },
+        {
+            "terrain_name": "Plains",
+            "id": 1,
             "defence_modifier": 0,
             "income_modifier": 2,
             "color": [0, 255, 0, 100]
         },
         {
             "terrain_name": "Mountains",
-            "id": 1,
+            "id": 2,
             "defence_modifier": 3,
             "income_modifier": 0,
             "color": [0, 0, 255, 100]
         },
         {
             "terrain_name": "Desert",
-            "id": 2,
+            "id": 3,
             "defence_modifier": 2,
             "income_modifier": 0,
             "color": [255, 255, 0, 100]
         },
         {
             "terrain_name": "Forest",
-            "id": 3,
+            "id": 4,
             "defence_modifier": 1,
             "income_modifier": 1,
             "color": [0, 255, 0, 100]
         },
         {
             "terrain_name": "Swamp",
-            "id": 4,
+            "id": 5,
             "defence_modifier": 2,
             "income_modifier": 1,
             "color": [0, 255, 200, 100]

@@ -21,7 +21,7 @@ class GameWindowClass:
             
         # statystyki hexow
         self.scale = 1
-        hexScale = 2/3 # <--------------------------------------------------------------
+        hexScale = 1 # <--------------------------------------------------------------
         hex_unscaled_number_x = int(self.origin_X_hex_number * hexScale) #30
         hex_unscaled_number_y = int(self.origin_Y_hex_number * hexScale) #20
         hex_unscaled_size = hex_size / hexScale
@@ -394,9 +394,13 @@ class GameWindowClass:
         background.fill("grey") 
 
         running = True
+
+        #  pygame.mouse.set_cursor(*pygame.cursors.arrow)
         while running:
 
             self.viewSurface.blit(background, (self.startX, self.startY))
+
+            pygame.draw.polygon(self.viewSurface, self.waterColor, [[0,0], [0, 20000], [20000, 20000], [200000, 0]], 0)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -429,8 +433,6 @@ class GameWindowClass:
 
             self.draw_player_stuff(self.viewSurface, player_provinces, (255, 0, 0, 255))
 
-            test4 = [[[3,0], [4,0], [4,1], [4,2], [2, 0], [3,1]]]
-            self.draw_player_stuff(self.viewSurface, test4, "green")
 
             self.draw_building(self.viewSurface, "l", 0 , test)
             self.draw_army(self.viewSurface, "U", 0, 13 , "P", 1, 4, test)
@@ -456,7 +458,7 @@ pygame.init()
 gameWindow = None
 # gameWindow = pygame.display.set_mode((2000, 1000))
 
-game = GameWindowClass( gameWindow , 0, 0, 1, 16, 30, 20)
+game = GameWindowClass( gameWindow , 0, 0, 1, 24, 20, 15)
 game.runGame()
 
 # zaleznosc hexow od wielkosci okna a nie odwrotnie 
