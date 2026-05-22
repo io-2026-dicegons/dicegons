@@ -1,6 +1,8 @@
 import pytest
 
 from game.unit import UnitType
+from game.squad import Squad
+from game.player import Player
 
 @pytest.fixture
 def unit_type():

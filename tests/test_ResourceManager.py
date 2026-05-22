@@ -222,7 +222,8 @@ def test_load_single_terrain (tmp_path):
     assert loaded_terrain.id == 1
     assert loaded_terrain.defence_modifier == 2
     assert loaded_terrain.income_modifier == 0
-    
+    assert loaded_terrain.color == [0, 255, 0, 100]
+
 def test_get_terrain_by_id (tmp_path):
     file = tmp_path / "terrain.json"
 
@@ -234,14 +235,14 @@ def test_get_terrain_by_id (tmp_path):
             "id": 1,
             "defence_modifier": 2,
             "income_modifier": 0,
-            "color": [0, 255, 0, 100]
+            "color": [0, 100, 0, 100]
         },
         {
             "terrain_name": "Forest",
             "id": 3,
             "defence_modifier": 1,
             "income_modifier": 1,
-            "color": [0, 255, 0, 100]
+            "color": [0, 10, 200, 100]
         }
       ]
     }
@@ -255,6 +256,7 @@ def test_get_terrain_by_id (tmp_path):
     assert loaded_terrain.id == 1
     assert loaded_terrain.defence_modifier == 2
     assert loaded_terrain.income_modifier == 0    
+    assert loaded_terrain.color == [0, 100, 0, 100]
     
     # re-work test
     loaded_terrain = rm.get_terrain_by_id(3)
@@ -262,6 +264,7 @@ def test_get_terrain_by_id (tmp_path):
     assert loaded_terrain.id == 3
     assert loaded_terrain.defence_modifier == 1
     assert loaded_terrain.income_modifier == 1   
+    assert loaded_terrain.color == [0, 10, 200, 100]
     
 
     

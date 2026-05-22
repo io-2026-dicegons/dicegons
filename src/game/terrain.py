@@ -6,7 +6,7 @@ class TerrainType:
         self.id = id
         self.defence_modifier = defence_modifier
         self.income_modifier = income_modifier
-        self.color =  income_modifier
+        self.color =  color
     # change to dataclass?
     
     

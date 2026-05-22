@@ -3,6 +3,8 @@ import sys
 import math
 import json 
 #importy
+from game.resourceManager import ResourceManager
+
 
 #komentarze sa po to bo mam wrazenier ze nie ogarne kodu sam zaraz a co dopiero wy
 class GameWindowClass:
@@ -49,18 +51,17 @@ class GameWindowClass:
 
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("IOIOIOIO")
-
+        
+        
         # wczytywanie bazy danych
+        self.resource_manager = ResourceManager()
+        self.resource_manager.load_definitions()
+        
         with open("scenario_one.json") as f:
             scenario_data = json.load(f)
 
         self.provinces = scenario_data["provinces"]
         # print(self.provinces)
-
-        with open("game/terrain_types.json") as f:
-            terrain_data = json.load(f)
-
-        self.terrain = terrain_data["terrain_types"]
 
     def draw_hex(self, surface, color, width, position ):
         
@@ -344,7 +345,7 @@ class GameWindowClass:
         province_hexes = province["hexList"]
         terrain_id = province["terrain_ID"]
 
-        color = self.terrain[terrain_id]["color"]
+        color = self.resource_manager.get_terrain_by_id(terrain_id).color
 
         self.draw_map(surface, province_hexes, color, 0)
         if(self.glow == province):
