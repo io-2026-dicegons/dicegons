@@ -17,7 +17,7 @@ class GameController:
 
     #funkcje UI get
 
-    def get_terraine_color(self, terrain_type_id):
+    def get_terrain_color(self, terrain_type_id):
         return self.resource_manager.get_terrain_by_id( terrain_type_id ).color
     
     def get_terrain_defence_modifier(self, terrain_type_id):
