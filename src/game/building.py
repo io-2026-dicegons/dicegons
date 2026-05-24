@@ -5,4 +5,5 @@ class Building:
         self.id = id
         self.defence_modifier = defence_modifier
         self.income_modifier = income_modifier
-
+        self.symbol = None
+        self.symbol_code = None

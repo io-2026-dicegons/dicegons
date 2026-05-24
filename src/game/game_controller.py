@@ -2,22 +2,94 @@
 from game.turn import Turn
 from game.map import Map
 from game.hexagon import Hexagon
-from game.coordinate import Coordinate
+from game.resourceManager import ResourceManager
+from game.player import Player
+from game.army import Army
 
 class GameController:
 
-    def __init__(self):
+    def __init__(self, resource_manager):
         self.map = None
-        self.player_list = []
+        self.player_list = {}
         self.turn = Turn()
-
-    def init_map(self, height, width ):
-        self.map = Map(height, width)
+        self.map = Map()
+        self.resource_manager = resource_manager
 
     #funkcje UI get
 
-    def get_map(self):
-        return self.map
+    def get_terraine_color(self, terrain_type_id):
+        return self.resource_manager.get_terrain_by_id( terrain_type_id ).color
+    
+    def get_terrain_defence_modifier(self, terrain_type_id):
+        return self.resource_manager.get_terrain_by_id( terrain_type_id ).defence_modifier
+    
+    def get_terrain_income(self, terrain_type_id):
+        return self.resource_manager.get_terrain_by_id( terrain_type_id ).income_modifier
+    
+    def get_terrain_name(self, terrain_type_id):
+        return self.resource_manager.get_terrain_by_id( terrain_type_id ).terrain_name
+    
+
+    def get_unit_symbol(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).symbol
+    
+    def get_unit_symbol_code(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).symbol_code
+    
+    def get_unit_max_stack(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).max_quantity
+    
+    def get_unit_attack_dice(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).attack_dice
+    
+    def get_unit_defence_dice(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).defence_dice
+    
+    def get_unit_price(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).price
+    
+    def get_unit_name(self, unit_id):
+        return self.resource_manager.get_unit_by_id( unit_id ).name
+    
+
+    def get_building_symbol(self, building_id):
+        return self.resource_manager.get_building_by_id( building_id ).symbol
+    
+    def get_building_symbol_code(self, building_id):
+        return self.resource_manager.get_building_by_id( building_id ).symbol_code
+    
+    def get_building_income(self, building_id):
+        return self.resource_manager.get_building_by_id( building_id ).income_modifier
+    
+    def get_building_defence(self, building_id):
+        return self.resource_manager.get_building_by_id( building_id ).defence_modifier
+    
+    def get_building_name(self, building_id):
+        return self.resource_manager.get_building_by_id( building_id ).name
+    
+
+    def get_army_squad_stack(self, province_id, squad_id ):
+        army = self.map.province_list[ province_id ].army
+        squad = army.get_squad( squad_id )
+        return squad.quantity
+    
+    def get_army_squad_unit_type(self, province_id, squad_id ):
+        army = self.map.province_list[ province_id ].army
+        squad = army.get_squad( squad_id )
+        return squad.squad_type
+    
+    def get_province_hex_list(self, provine_id):
+        return self.map.province_list[ provine_id ].hexagons_list
+    
+    def get_province_owner(self, provine_id):
+        return self.map.province_list[ provine_id ].player_id
+    
+    def get_province_building(self, provine_id):
+        return self.map.province_list[ provine_id ].building
+    
+    def get_province_terrain(self, provine_id):
+        return self.map.province_list[ provine_id ].terrain
+
 
     #funkcje load game set
 
@@ -27,6 +99,8 @@ class GameController:
     def add_hex_to_province(self, province_id, hexagon ):
         self.get_map().get_province_list()[ province_id ].append( hexagon )
 
+    #funkcje sprawdzające poprawność
+
     def check_correctness(self):
 
         #czy liczba graczy w player_list jest równa liczbie w turn
@@ -34,36 +108,134 @@ class GameController:
             pass
 
         #czy nie ma dwóch prowincj o takim samym id
+        #provine_list jest tablicą asocjacyjną indeksowaną provine_id
+
+        #każda prowincja ma przynajmniej 3 heksagony
+        for p in map.province_list:
+            if len( p.hexagons_list ) < 3:
+                return False
+
+        #każdy skład ma istniejący typ
+        for p in map.province_list:
+            army = p.army
+            if not self.resource_manager.get_unit_by_id( army.first_squad.squad_type ):
+                return False
+            
+            if not self.resource_manager.get_unit_by_id( army.second_squad.squad_type ):
+                return False
+
+        #każdy skład ma prawidłową liczebność
+        for p in map.province_list:
+            army = p.army
+            if not self.check_squad_quantity( army.first_squad ):
+                return False
+            
+            if not self.check_squad_quantity( army.second_squad ):
+                return False
+
+        #każdy budynek ma istniejący typ
+        for p in map.province_list:
+            if not self.resource_manager.get_building_by_id( p.building ):
+                return False
+
+        #każda prowincja ma istniejący typ terenu
+        for p in map.province_list:
+            if not self.resource_manager.get_terrain_by_id( p.terrain ):
+                return False
+
+        #żaden heks nie należy do dwóch prowincji
+
+    def check_squad_quantity(self, squad):
+
+        squad_type = self.resource_manager.get_unit_by_id( squad.squad_type )
+
+        if squad.quantity <= 0 :
+            return False
+        
+        if squad.quantity > squad_type.max_quantity :
+            return False
+        
+        return True
+    
 
     #funkcje do gry
 
     def attack(self, province_from, province_to):
 
+        #czy jest faza ataku
+        if not self.turn.get_phase == ATTACK_PHASE:
+            return False
+
         #czy province_from istnieje
+        if not self.map.check_provine_by_id( province_from ):
+            return False
 
         #czy province_to istnieje
+        if not self.map.check_provine_by_id( province_to ):
+            return False
 
         #czy province_from należy do gracza który teraz wykonuje ruch
+        attacker = self.map.province_list[ province_from ].player_id
+        if self.player_list[ self.turn.get_current_player() ].player_id != attacker :
+            return False
 
         #czy province_to nie należy do gracza który teraz wykonuje ruch
+        defender = self.map.province_list[ province_from ].player_id
+        if self.player_list[ self.turn.get_current_player() ].player_id == defender :
+            return False
 
         #czy province_from sąsiaduje z province_to
 
         #czy province_from ma armie
+        if self.map.province_list[ province_from ].army == None :
+            return False
 
         #czy province_from ma armie z przynajmniej jednym oddziałem
+        army = self.map.province_list[ province_from ].army
+        if army.first_squad == None :
+            return False
+        
+        if army.second_squad == None :
+            return False
 
-        pass
+        # stoczenie bitwy
 
-    def move(self, province_from, province_to):
+        attack = self.map.province_list[ province_from ].get_attack()
+        defence = self.map.province_list[ province_to ].get_attack()
+
+        if attack > defence :
+            #atakujący wygrał
+            self.map.province_list[ province_to ].army = None
+            self.map.province_list[ province_to ].army = self.map.province_list[ province_from ].army
+            self.map.province_list[ province_from ].army = Army()
+
+            self.map.province_list[ province_to ].player_id = self.attacker
+        else:
+            self.map.province_list[ province_from ].army = None
+
+        return True
+
+    def move(self, province_from, province_to, squad_id ):
+
+        #czy jest faza ruchu
+        if not self.turn.get_phase == MOVEMENT_PHASE:
+            return False
 
         #czy province_from istnieje
+        if not self.map.check_provine_by_id( province_from ):
+            return False
 
         #czy province_to istnieje
+        if not self.map.check_provine_by_id( province_to ):
+            return False
 
         #czy province_from należy do gracza który teraz wykonuje ruch
+        if self.player_list[ self.turn.get_current_player() ].player_id != self.map.province_list[ province_from ].player_id :
+            return False
 
         #czy province_to należy do gracza który teraz wykonuje ruch
+        if self.player_list[ self.turn.get_current_player() ].player_id != self.map.province_list[ province_to ].player_id :
+            return False
 
         #czy province_from sąsiaduje z province_to
 
@@ -75,19 +247,45 @@ class GameController:
 
         pass
 
-    def buy_unit(self, unit_type, province_to):
+    def buy_unit(self, unit_type_id, province_to):
 
-        #czy gracza stać na zakup
+        #czy jest faza kupowania
+        if not self.turn.get_phase == BUYING_PHASE:
+            return False
+
+        player = self.player_list[ self.turn.get_current_player() ]
+        unit_type = self.resource_manager.get_unit_by_id( unit_type_id )
 
         #czy unit_type istnieje
+        if not unit_type:
+            return False
+
+        #czy gracza stać na zakup
+        if player.gold < unit_type.price :
+            return False
 
         #czy province_to istnieje
+        if not self.map.check_provine_by_id( province_to ):
+            return False
 
         #czy province_to należy do gracza który teraz wykonuje ruch
+        if player.player_id != self.map.province_list[ province_to ].player_id :
+            return False
 
         #czy province_to ma wolne miejsce na kupione jednostki
+        if not self.map.province_list[ province_to ].army.check_can_buy_unit( unit_type ):
+            return False
+        
+        self.map.province_list[ province_to ].army.buy_unit( unit_type )
 
-        pass
+        return True
+
+    def __income_calculation(self):
+        provinces = self.map.province_list
+        for p in provinces:
+            income = p.terrain + p.building
+            self.player_list[ p.player_id ].gold += income
 
     def next_phase(self):
-        self.turn.next_phase()
+        if self.turn.next_phase():
+            self.income_calculation()

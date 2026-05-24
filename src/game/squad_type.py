@@ -8,3 +8,5 @@ class SquadType:
         self.defence_modifier = None
         self.max_quantity = None
         self.price = None
+        self.symbol = None
+        self.symbol_code = None

@@ -1,8 +1,11 @@
+
+from game.army import Army
+
 class Province():
     def __init__(self, province_id ):
         self.province_id = province_id
         self.player_id = None
-        self.army = None
+        self.army = Army()
         self.terrain = None
         self.building = None
         self.hexagons_list = []
