@@ -15,6 +15,7 @@ class GameController:
         self.map = Map()
         self.resource_manager = resource_manager
 
+
     #funkcje UI get
 
     def get_terrain_color(self, terrain_type_id):

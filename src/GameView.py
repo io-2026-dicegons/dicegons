@@ -4,6 +4,7 @@ import math
 import json 
 #importy
 from game.resourceManager import ResourceManager
+from game.game_controller import GameController
 
 
 #komentarze sa po to bo mam wrazenier ze nie ogarne kodu sam zaraz a co dopiero wy
@@ -17,6 +18,10 @@ class GameWindowClass:
         self.origin_X_hex_number = origin_X_hex_number
         self.origin_Y_hex_number = origin_Y_hex_number
 
+        # wczytywanie bazy danych
+        self.resource_manager = ResourceManager()
+        self.resource_manager.load_definitions()
+        self.game_controler = GameController(self.resource_manager)
         
             
         # statystyki hexow
@@ -27,12 +32,13 @@ class GameWindowClass:
         hex_unscaled_size = hex_size / hexScale
         self.proportions = math.sqrt(3) / 2
 
-        self.waterColor = [38, 64, 171]
+        self.waterColor = GameController.get_terrain_color(self, 0)
 
         self.glow = None
         self.glow_color = [150, 150, 150, 10]
 
-        # sandColor = [195, 172, 126]
+        self.unit_number = 3
+
 
         # tutaj jest system od skalowania mapy bo bez tego to strasznie spixelizowane bylo
         self.hex_number_x = hex_unscaled_number_x 
@@ -46,24 +52,29 @@ class GameWindowClass:
         self.start_draw_pos = (self.startX + self.proportions * self.hex_size , self.startY + self.hex_size)
 
         #pygamestuff
-        self.gameWindow = pygame.display.set_mode(self.viewSize)
-        self.viewSurface = pygame.Surface(self.screenSize, pygame.SRCALPHA)
+
+        self.GUIsize = (300, 100)
+    
+        self.gameSize = (self.viewSize[0] + self.GUIsize[0], self.viewSize[1] + self.GUIsize[1])
+
+        self.gameWindow = pygame.display.set_mode((self.viewSize[0] + self.GUIsize[0], self.viewSize[1] + self.GUIsize[1]))
+        self.viewSurface = pygame.Surface(self.viewSize, pygame.SRCALPHA)
 
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("IOIOIOIO")
         
+
+
         
-        # wczytywanie bazy danych
-        self.resource_manager = ResourceManager()
-        self.resource_manager.load_definitions()
-        
+
         with open("scenario_one.json") as f:
             scenario_data = json.load(f)
 
         self.provinces = scenario_data["provinces"]
         # print(self.provinces)
 
-    def draw_hex(self, surface, color, width, position ):
+    
+    def draw_hex(self, surface, color, width, position ): 
         
         a = self.hex_size # bok
         h = self.proportions * a
@@ -79,7 +90,7 @@ class GameWindowClass:
         pygame.draw.polygon(surface, color, points, width)
         
 
-    def draw_border_hex(self, surface, color, width, position, edge):  
+    def draw_border_hex(self, surface, color, width, position, edge):  # borders for hexes
         #     0
         #  1 / \ 5
         #   |   | 
@@ -104,7 +115,7 @@ class GameWindowClass:
 
         pygame.draw.line(surface, color, p1, p2, width)
 
-    def draw_border_map(self, surface, hex_list, color, width): #granice miedzy prowincjami
+    def draw_border_map(self, surface, hex_list, color, width): # granice miedzy prowincjami
         i = 0
         j = 0
         for i, j in hex_list:
@@ -222,9 +233,11 @@ class GameWindowClass:
                 if(i + 1, j - 1) not in player_hex_set:
                     self.draw_province_border_hex(surface, color, width, position, [5, 0], size)
 
-    def draw_building(self, surface, symbol, font_index, hex_list):
+    def draw_building(self, surface, buildingID, hex_list):
         
         position = hex_list[2]
+        font_index = GameController.get_building_symbol_code(self, buildingID)
+        symbol = GameController.get_building_symbol(self, buildingID)
 
         #symbol = '\u028F'
         size = int(3/2 * self.hex_size)
@@ -283,7 +296,7 @@ class GameWindowClass:
 
         text_font = pygame.font.SysFont("times new roman", font_size, True)
 
-        if( font_index == 0):
+        if(font_index == 0):
             font = pygame.font.SysFont("webdings", font_size)  
         elif(font_index == 1):
             font = pygame.font.SysFont("wingdings", font_size)  
@@ -300,7 +313,7 @@ class GameWindowClass:
 
         #textRect.center = (pos_X, pos_Y)
         text_symbol_rect.center = (pos_X  - self.hex_size * 0.05, pos_Y + self.hex_size * 0.05 - self.hex_size/3)
-        surface.blit(text_symbol, text_symbol_rect)    
+        surface.blit(text_symbol, text_symbol_rect) 
         text_text_rect.center = (pos_X  - self.hex_size * 0.05, pos_Y + self.hex_size * 0.05 + self.hex_size/3)
         surface.blit(text_text, text_text_rect)  
 
@@ -327,6 +340,7 @@ class GameWindowClass:
 
     def draw_map(self, surface, hex_list, color, width):  #mapa z listy
         i,j = (0, 0)
+
         for i,j in hex_list: 
             w = math.sqrt(3) * self.hex_size
             h = 2 * self.hex_size
@@ -389,18 +403,187 @@ class GameWindowClass:
 
         return None
 
+    def draw_game(self, surface):
+        pygame.draw.polygon(self.viewSurface, self.waterColor, [[self.startX, self.startY], [self.startX, self.viewSize[1]], [self.viewSize[0], self.viewSize[1]], [self.viewSize[0], self.startY]], 0)
+        
+        self.draw_full_map(surface, self.waterColor, 0)
+        #tworzy prowincje
+        for province in self.provinces:
+            self.draw_province(surface, province)
+
+
+
+        test = [[0,0],[1,0],[1,1], [0,1]]
+        test2 = [[2,2],[2,1], [2,3], [3,2], [1, 2]]
+        test3 = [[0,2], [0,3], [0,4], [1,4], [1, 3]]
+
+        # zagladnij do game controlera o informacje jakie sa hexy (mapa)
+        # z mapy biore liste prowincje
+        # z kazdej prowincji biore liste hexow
+        # i lista hexow to jest np test2
+
+        player_provinces = [test, test2, test3]
+
+        self.draw_player_stuff(surface, player_provinces, (255, 0, 0, 255))
+        
+
+        # self.draw_building(self.viewSurface, "l", 0 , test)
+        # print(GameController.get_province_building(self, 0))
+        self.draw_army(surface, "U", 0, 13 , "P", 1, 4, test)
+
+    def draw_turn_block(self, surface):
+        gradient_color = [109, 110, 112]
+
+        size = [self.GUIsize[0], 75]
+        points = [[self.startX + self.viewSize[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY + size[1]], [self.startX + self.viewSize[0], self.startY + size[1]]]
+
+        pygame.draw.polygon(surface, gradient_color, points, 0)
+
+    
+    def draw_next_turn(self, surface):
+
+        font_size = 32
+
+        size = [self.GUIsize[0], 50]
+        gradient_color = [109, 110, 112]
+
+        x = self.startX + self.viewSize[0]
+        y = self.startY + self.viewSize[1] + self.GUIsize[1] - size[1]
+
+        rect = pygame.Rect(x, y, size[0], size[1])
+
+        pygame.draw.rect(surface, gradient_color, rect)
+
+        text_font = pygame.font.SysFont(
+            "times new roman",
+            font_size,
+            True
+        )
+
+        text = text_font.render(
+            "Next Turn =>",
+            True,
+            "Black"
+        )
+
+        text_rect = text.get_rect(center=rect.center)
+
+        surface.blit(text, text_rect)
+
+        self.next_turn_rect = rect
+
+    def draw_side(self, surface):
+        color = [72, 74, 79]
+        gradient_color = [109, 110, 112]
+        font_size = 64
+
+        points = [[self.startX + self.viewSize[0], self.startY], [self.startX + self.viewSize[0] + self.GUIsize[0], self.startY], [self.startX + self.viewSize[0] + self.GUIsize[0], self.startY + self.viewSize[1] + self.GUIsize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1] + self.GUIsize[1]]]
+
+
+        size = (abs(points[0][0] - points[1][0]), abs(points[0][1] - points[2][1]))
+
+        center = [points[0][0] + 0.5 * size[0], points[0][1] + 0.5 * size[1]]
+
+        pygame.draw.polygon(surface, color, points, 0)
+
+        self.draw_turn_block(surface)
+        self.draw_next_turn(surface)
+
+
+    def get_clicked_unit(self, mouse_pos, unit_number):
+
+        points = [
+            [self.startX, self.startY + self.viewSize[1] + self.GUIsize[1]],
+            [self.startX, self.startY + self.viewSize[1]],
+            [self.startX + self.viewSize[0], self.startY + self.viewSize[1]],
+            [self.startX + self.viewSize[0], self.startY + self.viewSize[1] + self.GUIsize[1]]
+        ]
+
+        size = (
+            abs(points[0][0] - points[3][0]),
+            abs(points[0][1] - points[1][1])
+        )
+
+        font_size = 64
+
+        for i in range(1, unit_number + 1):
+
+            position = (
+                points[0][0] + i * size[0] / (unit_number + 1),
+                points[0][1] - size[1] / 2
+            )
+
+            rect = pygame.Rect(0, 0, font_size, font_size)
+            rect.center = position
+
+            if rect.collidepoint(mouse_pos):
+                return i - 1
+
+        return None
+    
+    def next_turn_clicked(self, mouse_pos): 
+        if self.next_turn_rect.collidepoint(mouse_pos):
+            return True
+        
+        return False
+
+    def draw_bottom(self, surface):
+        color = [72, 74, 79]
+        gradient_color = [109, 110, 112]
+        font_size = 64
+
+        points = [[self.startX, self.startY + self.viewSize[1] + self.GUIsize[1]], [self.startX, self.startY + self.viewSize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1] + self.GUIsize[1]]]
+
+
+        size = (abs(points[0][0] - points[3][0]), abs(points[0][1] - points[1][1]))
+
+        pygame.draw.polygon(surface, color, points, 0)
+
+        for i in range (1, self.unit_number + 1):
+            # font_index = GameController.get_unit_symbol_code(self.game_controler, i)
+            font_index = 0
+            # symbol = 
+            symbol = "U"
+
+            if(font_index == 0):
+                font = pygame.font.SysFont("webdings", font_size)  
+            elif(font_index == 1):
+                font = pygame.font.SysFont("wingdings", font_size)  
+            elif(font_index == 2):
+                font = pygame.font.SysFont("wingdings2", font_size)  
+            else:
+                font = pygame.font.SysFont("wingdings3", font_size)  
+
+            text_symbol = font.render(symbol, True, "Black", None)
+            text_symbol_rect = text_symbol.get_rect()
+
+
+            position = ((points[0][0] + i* size[0]/(self.unit_number + 1),  points[0][1] - size[1]/2))
+
+            text_symbol_rect.center = position
+            pygame.draw.rect(surface, gradient_color, text_symbol_rect, 0)
+            surface.blit(text_symbol, text_symbol_rect)
+
+    def draw_GUI(self, surface):
+        self.draw_bottom(surface)
+        self.draw_side(surface)
+
     def runGame(self):
         background = pygame.Surface(self.screenSize, pygame.SRCALPHA) 
-        background.fill("grey") 
+
 
         running = True
 
-        #  pygame.mouse.set_cursor(*pygame.cursors.arrow)
         while running:
 
-            self.viewSurface.blit(background, (self.startX, self.startY))
+            unit_number = 3
 
-            pygame.draw.polygon(self.viewSurface, self.waterColor, [[0,0], [0, 20000], [20000, 20000], [200000, 0]], 0)
+            self.viewSurface.blit(background, (self.startX, self.startY))
+            self.gameWindow.blit(self.viewSurface, (0,0))
+
+            # draw GUI directly on gameWindow
+            # self.draw_bottom(self.gameWindow)
+
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -411,33 +594,19 @@ class GameWindowClass:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     province = self.get_clicked_province(event.pos)
                 
+                    clicked = self.get_clicked_unit(pygame.mouse.get_pos(), self.unit_number)
+
+                    if clicked is not None:
+                        print("kliknięto unit:", clicked)
                     if (province is not None):
                         print("Province ID =", province["ID"])
                         self.glow = province
+                    if self.next_turn_clicked(event.pos):
+                        print("NEXT TURN")
                     
 
-            # rysuje cala mape poza jako wode 
-            self.draw_full_map(self.viewSurface, self.waterColor, 0)
-
-            #tworzy prowincje
-            for province in self.provinces:
-                self.draw_province(self.viewSurface, province)
-
-
-
-            test = [[0,0],[1,0],[1,1], [0,1]]
-            test2 = [[2,2],[2,1], [2,3], [3,2], [1, 2]]
-            test3 = [[0,2], [0,3], [0,4], [1,4], [1, 3]]
-
-            player_provinces = [test, test2, test3]
-
-            self.draw_player_stuff(self.viewSurface, player_provinces, (255, 0, 0, 255))
-
-
-            self.draw_building(self.viewSurface, "l", 0 , test)
-            self.draw_army(self.viewSurface, "U", 0, 13 , "P", 1, 4, test)
-    
-
+            self.draw_game(self.viewSurface)
+            self.draw_GUI(self.gameWindow)
             
             scaled = pygame.transform.smoothscale(self.viewSurface, self.viewSize)
             self.gameWindow.blit(scaled, (0, 0))
@@ -461,4 +630,5 @@ gameWindow = None
 game = GameWindowClass( gameWindow , 0, 0, 1, 24, 20, 15)
 game.runGame()
 
-# zaleznosc hexow od wielkosci okna a nie odwrotnie 
+
+# lista wszystkich getow
