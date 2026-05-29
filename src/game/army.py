@@ -38,9 +38,9 @@ class Army:
         
         return False
 
-    def get_squad(self, squad_id ):
+    def get_squad(self, squad_nr ):
 
-        if self.first_squad.squad_id == squad_id:
+        if squad_nr == 1:
             return self.first_squad
-        elif self.second_squad.squad_id == squad_id:
+        elif squad_nr == 2:
             return self.second_squad

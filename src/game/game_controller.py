@@ -1,10 +1,11 @@
 
-from game.turn import Turn
+from game.turn import *
 from game.map import Map
 from game.hexagon import Hexagon
 from game.resourceManager import ResourceManager
 from game.player import Player
 from game.army import Army
+from game.province import Province
 
 class GameController:
 
@@ -15,10 +16,20 @@ class GameController:
         self.map = Map()
         self.resource_manager = resource_manager
 
-
     #funkcje UI get
+    def get_player_list(self):
+        return self.player_list
 
-    def get_terrain_color(self, terrain_type_id):
+    def get_player_hexes(self, player_id):
+        heks = []
+        for p in self.map.get_province_list():
+            if p.player_id == player_id:
+                for h in p.get_hexagons_list():
+                    heks.append( h )
+        
+        return heks
+
+    def get_terraine_color(self, terrain_type_id):
         return self.resource_manager.get_terrain_by_id( terrain_type_id ).color
     
     def get_terrain_defence_modifier(self, terrain_type_id):
@@ -69,14 +80,14 @@ class GameController:
         return self.resource_manager.get_building_by_id( building_id ).name
     
 
-    def get_army_squad_stack(self, province_id, squad_id ):
+    def get_army_squad_stack(self, province_id, squad_nr ):
         army = self.map.province_list[ province_id ].army
-        squad = army.get_squad( squad_id )
+        squad = army.get_squad( squad_nr )
         return squad.quantity
     
-    def get_army_squad_unit_type(self, province_id, squad_id ):
+    def get_army_squad_unit_type(self, province_id, squad_nr ):
         army = self.map.province_list[ province_id ].army
-        squad = army.get_squad( squad_id )
+        squad = army.get_squad( squad_nr )
         return squad.squad_type
     
     def get_province_hex_list(self, provine_id):
@@ -160,6 +171,25 @@ class GameController:
     
 
     #funkcje do gry
+    def if_adjacent( province_from, province_to ):
+
+        heks_from = []
+
+        for h in province_from.get_province_hex_list():
+            heks_from.append( h )
+
+        heks_adjacent = []
+        for h in heks_from:
+            heks = Hexagon( h )
+
+            for a in heks.get_adjacent_hexes_list():
+                heks_adjacent.append( a )
+
+        for h in province_to.get_province_hex_list():
+            if h in heks_adjacent:
+                return True
+
+        return False
 
     def attack(self, province_from, province_to):
 
@@ -186,6 +216,8 @@ class GameController:
             return False
 
         #czy province_from sąsiaduje z province_to
+        if not self.if_adjacent( province_from, province_to ):
+            return False
 
         #czy province_from ma armie
         if self.map.province_list[ province_from ].army == None :
@@ -216,7 +248,7 @@ class GameController:
 
         return True
 
-    def move(self, province_from, province_to, squad_id ):
+    def move(self, province_from, squad_nr_from, province_to, squad_nr_to ):
 
         #czy jest faza ruchu
         if not self.turn.get_phase == MOVEMENT_PHASE:
@@ -239,12 +271,30 @@ class GameController:
             return False
 
         #czy province_from sąsiaduje z province_to
+        if not self.if_adjacent( province_from, province_to ):
+            return False
 
         #czy province_from ma armie
+        if self.map.province_list[ province_from ].army == None :
+            return False
 
-        #czy province_from ma armie z przynajmniej jednym oddziałem
+        squad_from = self.map.province_list[ province_from ].army.get_squad( squad_nr_from )
+        #czy province_from ma armie z oddziałem squad_nr_from
+        if squad_from == None :
+            return False
 
+        squad_to = self.map.province_list[ province_from ].army.get_squad( squad_nr_to )
+        squad_type = self.resource_manager.get_unit_by_id( squad_to.squad_type )
         #czy province_to ma wolne miejsce na jednostki
+        if squad_to != None and squad_type == squad_from.squad_type and squad_type.max_quantity - squad_to.quantity >= squad_from.quantity :
+            return False
+        
+        if squad_to == None :
+            self.map.province_list[ province_from ].army.get_squad( squad_nr_to ) = squad_from
+        else:
+            squad_to.quantity += squad_from.quantity
+
+        self.map.province_list[ province_from ].army.get_squad( squad_nr_from ) = None
 
         pass
 
