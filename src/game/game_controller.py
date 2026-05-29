@@ -29,7 +29,7 @@ class GameController:
         
         return heks
 
-    def get_terraine_color(self, terrain_type_id):
+    def get_terrain_color(self, terrain_type_id):
         return self.resource_manager.get_terrain_by_id( terrain_type_id ).color
     
     def get_terrain_defence_modifier(self, terrain_type_id):
@@ -290,11 +290,11 @@ class GameController:
             return False
         
         if squad_to == None :
-            self.map.province_list[ province_from ].army.get_squad( squad_nr_to ) = squad_from
+            self.map.province_list[ province_from ].army.set_squad( squad_nr_to, squad_from )
         else:
             squad_to.quantity += squad_from.quantity
 
-        self.map.province_list[ province_from ].army.get_squad( squad_nr_from ) = None
+        self.map.province_list[ province_from ].army.set_squad( squad_nr_from, None )
 
         pass
 

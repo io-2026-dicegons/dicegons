@@ -44,3 +44,10 @@ class Army:
             return self.first_squad
         elif squad_nr == 2:
             return self.second_squad
+        
+    def set_squad(self, squad_nr, squad ):
+
+        if squad_nr == 1:
+            self.first_squad = squad;
+        elif squad_nr == 2:
+            self.second_squad = squad;
