@@ -36,6 +36,10 @@ class GameWindowClass:
 
         self.glow = None
         self.glow_color = [150, 150, 150, 10]
+        
+        self.font = "Times new roman"
+
+        self.clicked = None
 
         self.unit_number = 3
 
@@ -54,6 +58,8 @@ class GameWindowClass:
         #pygamestuff
 
         self.GUIsize = (300, 100)
+        self.GUI_color = [72, 74, 79]
+        self.GUI_gradient = [109, 110, 112]
     
         self.gameSize = (self.viewSize[0] + self.GUIsize[0], self.viewSize[1] + self.GUIsize[1])
 
@@ -294,7 +300,7 @@ class GameWindowClass:
         pos_X = self.start_draw_pos[0] + x_offset
         pos_Y = self.start_draw_pos[1] + y_offset
 
-        text_font = pygame.font.SysFont("times new roman", font_size, True)
+        text_font = pygame.font.SysFont(self.font, font_size, True)
 
         if(font_index == 0):
             font = pygame.font.SysFont("webdings", font_size)  
@@ -394,14 +400,7 @@ class GameWindowClass:
         return [i, j]
 
 
-    def get_clicked_province(self, mouse_pos):
-        clicked_hex = self.pixel_to_hex(mouse_pos)
 
-        for province in self.provinces:
-            if clicked_hex in province["hexList"]:
-                return province
-
-        return None
 
     def draw_game(self, surface):
         pygame.draw.polygon(self.viewSurface, self.waterColor, [[self.startX, self.startY], [self.startX, self.viewSize[1]], [self.viewSize[0], self.viewSize[1]], [self.viewSize[0], self.startY]], 0)
@@ -427,25 +426,337 @@ class GameWindowClass:
         self.draw_player_stuff(surface, player_provinces, (255, 0, 0, 255))
         
 
-        # self.draw_building(self.viewSurface, "l", 0 , test)
-        # print(GameController.get_province_building(self, 0))
+        # self.draw_building(self.viewSurface, "l", 0 , test) #<------------------------------------------
+        # print(self.game_controler.get_province_building( 0 ))
         self.draw_army(surface, "U", 0, 13 , "P", 1, 4, test)
 
     def draw_turn_block(self, surface):
-        gradient_color = [109, 110, 112]
+        color = "gray"
+        gradient_color = self.GUI_gradient
+
+        font_size = 16
+        
+        turn_type = 0
+
+        turn_player = 1
 
         size = [self.GUIsize[0], 75]
         points = [[self.startX + self.viewSize[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY + size[1]], [self.startX + self.viewSize[0], self.startY + size[1]]]
 
-        pygame.draw.polygon(surface, gradient_color, points, 0)
+        turn_timer_size = [size[0]/3, size[1]]
+        turn_timer_points = [[points[1][0] - turn_timer_size[0], points[1][1]], points[1], points[2], [points[1][0] - turn_timer_size[0], points[3][1]]]
 
+        pygame.draw.polygon(surface, gradient_color, points, 0)
+        
+        # pygame.draw.polygon(surface, "red", turn_timer_points, 0)
+        points_place = [turn_timer_points[0], turn_timer_points[1], [turn_timer_points[1][0], turn_timer_points[1][1] + 1/3 * turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + 1/3 * turn_timer_size[1]]]
+        points_attack = [[turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + 2/3 * turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + 2/3 * turn_timer_size[1]] ]
+        points_move = [[turn_timer_points[0][0], turn_timer_points[0][1]  + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] +  turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1]] ]
+        
+
+        pygame.draw.polygon(surface, color, points_place)
+        pygame.draw.polygon(surface, gradient_color, points_attack)
+        pygame.draw.polygon(surface, color, points_move)
+        
+        text_font = pygame.font.SysFont(self.font, font_size + 30, True ) 
+
+        text = ""
+        if( turn_player == 0):
+            text = "Player A"
+        else:
+            text = "Player B"
+
+        text_player = text_font.render(text, True, "Black")
+        text_player_rect = text_player.get_rect(midleft = (points[0][0], (points[0][1] + points[3][1])/2))
+        surface.blit(text_player, text_player_rect)
+
+        text_font = pygame.font.SysFont(self.font, font_size, True )
+
+        text_place = text_font.render("Placing", True, "Black")
+        text_place_rect = text_place.get_rect(midleft = (points_place[0][0], (points_place[0][1] + points_place[3][1]) / 2))
+        surface.blit(text_place, text_place_rect)
+
+        text_attack = text_font.render("Attacking", True, "Black")
+        text_attack_rect = text_attack.get_rect(midleft = (points_attack[0][0], (points_attack[0][1] + points_attack[3][1]) / 2))
+        surface.blit(text_attack, text_attack_rect)
+
+        text_move = text_font.render("Moving", True, "Black")
+        text_move_rect = text_move.get_rect(midleft = (points_move[0][0], (points_move[0][1] + points_move[3][1]) / 2))
+        surface.blit(text_move, text_move_rect)
+
+        text_font = pygame.font.SysFont("Wingdings3", font_size + 10, True )
+
+        arrow_points = [0, 0]
+        if(turn_type == 0):
+            arrow_points = (points_place[0][0], (points_place[0][1] + points_place[3][1]) / 2)
+        elif(turn_type == 1):
+            arrow_points = (points_attack[0][0], (points_attack[0][1] + points_attack[3][1]) / 2)
+        else: 
+            arrow_points = (points_move[0][0], (points_move[0][1] + points_move[3][1]) / 2)
+
+        text_move = text_font.render("a", True, "Black")
+        text_move_rect = text_move.get_rect(midright = arrow_points)
+        surface.blit(text_move, text_move_rect)
+
+        
+    def draw_null_block(self, surface):
+        font_size = 28
+
+        scale = 2/3
+        size = [self.GUIsize[0], 50]
+        size = [size[0] * scale, size[1] * scale]
+        
+        gradient_color = self.GUI_gradient
+
+        x = self.startX + self.viewSize[0] + 1/2 * self.GUIsize[0]
+        y = self.startY + self.viewSize[1] + self.GUIsize[1] - size[1] - 50
+
+        rect = pygame.Rect(x, y, size[0], size[1])
+        rect.center = (x, y)
+
+
+        pygame.draw.rect(surface, gradient_color, rect)
+
+        text_font = pygame.font.SysFont(self.font, font_size, True )
+
+        text = text_font.render("Cancel", True, "Black")
+
+        text_rect = text.get_rect(center = (x, y))
+
+        surface.blit(text, text_rect)
+
+        self.null_block_rect = rect
     
+    def draw_table(self, surface, center):
+        scale = 0.8
+
+        font_size = 26
+
+        font_color = "gray"
+
+        name_font_size = 32
+        size = [self.GUIsize[0], 50]
+        size = [size[0] * scale, size[1] * scale]
+
+        line_size = 150
+
+        name_position = [center[0], center[1] - line_size - 75]
+
+
+        
+        if(self.clicked == None):
+            return 
+
+        showed_object = self.clicked
+
+
+        if( showed_object["type"] == 'unit' ):
+            offset = 25
+
+            print(self.clicked["id"])
+
+            symbol = "U"
+
+            font_index = 0
+
+            font_view_size = font_size + 16
+
+            name = "Placeholder"
+
+            text_font = pygame.font.SysFont(self.font, name_font_size, True )
+
+            text_player = text_font.render(name, True, "Black")
+            text_player_rect = text_player.get_rect(center = name_position )
+            surface.blit(text_player, text_player_rect)
+
+            #pygame.draw.line(surface, self.GUI_gradient, [center[0] + offset, center[1] - line_size], [center[0] + offset, center[1] + line_size], 5)
+
+            if(font_index == 0):
+                font = pygame.font.SysFont("webdings", font_view_size)  
+            elif(font_index == 1):
+                font = pygame.font.SysFont("wingdings", font_view_size)  
+            elif(font_index == 2):
+                font = pygame.font.SysFont("wingdings2", font_view_size)  
+            else:
+                font = pygame.font.SysFont("wingdings3", font_view_size)  
+
+            text_symbol = font.render(symbol, True, "Black", None)
+            text_symbol_rect = text_symbol.get_rect()
+            text_symbol_rect.center = (name_position[0], name_position[1] + 1.5 * font_size )
+
+            surface.blit(text_symbol, text_symbol_rect)
+
+            
+            text_font = pygame.font.SysFont(self.font, font_size, True )
+
+            
+
+            positions = (self.viewSize[0] + 15, center[1] - 0.75 * line_size)
+
+            shift = 0.5
+            A_Dice = text_font.render("Attack Dice", True, font_color)
+            A_Dice_rect = text_player.get_rect(midleft = positions )
+            surface.blit(A_Dice, A_Dice_rect)
+
+            A_Dice_Value = 0
+            A_Dice_Value = str(A_Dice_Value)
+            A_Dice_Value_text = text_font.render(A_Dice_Value, True, font_color)
+            A_Dice_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(A_Dice_Value_text, A_Dice_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            D_Dice = text_font.render("Defence Dice", True, font_color)
+            D_Dice_rect = text_player.get_rect(midleft = positions )
+            surface.blit(D_Dice, D_Dice_rect)
+
+            D_Dice_Value = 0
+            D_Dice_Value = str(D_Dice_Value)
+            D_Dice_Value_text = text_font.render(D_Dice_Value, True, font_color)
+            D_Dice_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(D_Dice_Value_text, D_Dice_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            M_Stack = text_font.render("Max Stack", True, font_color)
+            M_Stack_rect = text_player.get_rect(midleft = positions )
+            surface.blit(M_Stack, M_Stack_rect)
+
+            M_Stack_Value = 0
+            M_Stack_Value = str(M_Stack_Value)
+            M_Stack_Value_text = text_font.render(M_Stack_Value, True, font_color)
+            M_Stack_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(M_Stack_Value_text, M_Stack_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            U_Price = text_font.render("Unit Price", True, font_color)
+            U_Price_rect = text_player.get_rect(midleft = positions )
+            surface.blit(U_Price, U_Price_rect)
+
+            U_Price_Value = 0
+            U_Price_Value = str(U_Price_Value)
+            U_Price_Value_text = text_font.render(U_Price_Value, True, font_color)
+            U_Price_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(U_Price_Value_text, U_Price_Value_rect)
+
+
+
+
+        if( showed_object["type"] == 'province'):
+
+            name = "Placeholder"
+
+            text_font = pygame.font.SysFont(self.font, name_font_size, True )
+
+            text_player = text_font.render(name, True, "Black")
+            text_player_rect = text_player.get_rect(center = name_position )
+            surface.blit(text_player, text_player_rect)
+
+
+            terrain_id = showed_object["id"]
+            # view_symbol_color = self.resource_manager.get_terrain_by_id(terrain_id).color
+            view_symbol_color = "red"
+            view_symbol_border = "black"
+
+            symbol_size = font_size + 16
+            pygame.draw.circle(surface, view_symbol_color, (name_position[0], name_position[1] + 1.5 * font_size ), symbol_size/2, 0)
+            pygame.draw.circle(surface, view_symbol_border, (name_position[0], name_position[1] + 1.5 * font_size ), symbol_size/2, 6)
+            
+            text_font = pygame.font.SysFont(self.font, font_size, True )
+            positions = (self.viewSize[0] + 15, center[1] - 0.75 * line_size)
+
+            shift = 0.3
+            D_Mod = text_font.render("Defence Modifier", True, font_color)
+            D_Mod_rect = text_player.get_rect(midleft = positions )
+            surface.blit(D_Mod, D_Mod_rect)
+
+            D_Mod_Value = 0
+            D_Mod_Value = str(D_Mod_Value)
+            D_Mod_Value_text = text_font.render(D_Mod_Value, True, font_color)
+            D_Mod_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(D_Mod_Value_text, D_Mod_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            Income = text_font.render("Income", True, font_color)
+            Income_rect = text_player.get_rect(midleft = positions )
+            surface.blit(Income, Income_rect)
+
+            Income_Value = 0
+            Income_Value = str(Income_Value)
+            Income_Value_text = text_font.render(Income_Value, True, font_color)
+            Income_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(Income_Value_text, Income_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            name = "Placeholder2"
+
+            text_font = pygame.font.SysFont(self.font, name_font_size, True )
+
+            text_player = text_font.render(name, True, "Black")
+            text_player_rect = text_player.get_rect(center = (center[0], positions[1] ) )
+            surface.blit(text_player, text_player_rect)
+
+            positions = (positions[0], positions[1] + 0.9 * shift * line_size)
+            
+            font_index = 0
+            font_view_size = font_size + 16
+            symbol = "U"
+
+            if(font_index == 0):
+                font = pygame.font.SysFont("webdings", font_view_size)  
+            elif(font_index == 1):
+                font = pygame.font.SysFont("wingdings", font_view_size)  
+            elif(font_index == 2):
+                font = pygame.font.SysFont("wingdings2", font_view_size)  
+            else:
+                font = pygame.font.SysFont("wingdings3", font_view_size)  
+
+            text_symbol = font.render(symbol, True, "Black", None)
+            text_symbol_rect = text_symbol.get_rect()
+            text_symbol_rect.center = (center[0], positions[1] )
+
+            surface.blit(text_symbol, text_symbol_rect)
+
+            
+            text_font = pygame.font.SysFont(self.font, font_size, True )
+            positions = (positions[0], positions[1] + 1.1 * shift * line_size)
+
+            D_Mod_Building = text_font.render("Defence Modifier", True, font_color)
+            D_Mod_Building_rect = text_player.get_rect(midleft = positions )
+            surface.blit(D_Mod_Building, D_Mod_Building_rect)
+
+            D_Mod_Building_Value = 0
+            D_Mod_Building_Value = str(D_Mod_Building_Value)
+            D_Mod_Building_Value_text = text_font.render(D_Mod_Building_Value, True, font_color)
+            D_Mod_Building_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(D_Mod_Building_Value_text, D_Mod_Building_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            Income_Building = text_font.render("Unit Price", True, font_color)
+            Income_Building_rect = text_player.get_rect(midleft = positions )
+            surface.blit(Income_Building, Income_Building_rect)
+
+            Income_Building_Value = 0
+            Income_Building_Value = str(Income_Building_Value)
+            Income_Building_Value_text = text_font.render(Income_Building_Value, True, font_color)
+            Income_Building_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(Income_Building_Value_text, Income_Building_Value_rect)
+
+
+        
+
+
+
     def draw_next_turn(self, surface):
 
         font_size = 32
 
         size = [self.GUIsize[0], 50]
-        gradient_color = [109, 110, 112]
+        gradient_color = self.GUI_gradient
 
         x = self.startX + self.viewSize[0]
         y = self.startY + self.viewSize[1] + self.GUIsize[1] - size[1]
@@ -454,17 +765,9 @@ class GameWindowClass:
 
         pygame.draw.rect(surface, gradient_color, rect)
 
-        text_font = pygame.font.SysFont(
-            "times new roman",
-            font_size,
-            True
-        )
+        text_font = pygame.font.SysFont(self.font, font_size, True )
 
-        text = text_font.render(
-            "Next Turn =>",
-            True,
-            "Black"
-        )
+        text = text_font.render("Next Turn =>", True, "Black")
 
         text_rect = text.get_rect(center=rect.center)
 
@@ -473,8 +776,8 @@ class GameWindowClass:
         self.next_turn_rect = rect
 
     def draw_side(self, surface):
-        color = [72, 74, 79]
-        gradient_color = [109, 110, 112]
+        color = self.GUI_color
+        gradient_color = self.GUI_gradient
         font_size = 64
 
         points = [[self.startX + self.viewSize[0], self.startY], [self.startX + self.viewSize[0] + self.GUIsize[0], self.startY], [self.startX + self.viewSize[0] + self.GUIsize[0], self.startY + self.viewSize[1] + self.GUIsize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1] + self.GUIsize[1]]]
@@ -487,7 +790,9 @@ class GameWindowClass:
         pygame.draw.polygon(surface, color, points, 0)
 
         self.draw_turn_block(surface)
-        self.draw_next_turn(surface)
+        self.draw_next_turn(surface) 
+        self.draw_null_block(surface)
+        self.draw_table(surface, center)
 
 
     def get_clicked_unit(self, mouse_pos, unit_number):
@@ -526,10 +831,25 @@ class GameWindowClass:
             return True
         
         return False
+    
+    def null_block_clicked(self, mouse_pos): 
+        if self.null_block_rect.collidepoint(mouse_pos):
+            return True
+        
+        return False
+
+    def get_clicked_province(self, mouse_pos):
+        clicked_hex = self.pixel_to_hex(mouse_pos)
+
+        for province in self.provinces:
+            if clicked_hex in province["hexList"]:
+                return province
+
+        return None
 
     def draw_bottom(self, surface):
-        color = [72, 74, 79]
-        gradient_color = [109, 110, 112]
+        color = self.GUI_color
+        gradient_color = self.GUI_gradient
         font_size = 64
 
         points = [[self.startX, self.startY + self.viewSize[1] + self.GUIsize[1]], [self.startX, self.startY + self.viewSize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1]], [self.startX + self.viewSize[0], self.startY + self.viewSize[1] + self.GUIsize[1]]]
@@ -540,7 +860,7 @@ class GameWindowClass:
         pygame.draw.polygon(surface, color, points, 0)
 
         for i in range (1, self.unit_number + 1):
-            # font_index = GameController.get_unit_symbol_code(self.game_controler, i)
+            # font_index = self.game_controler.get_unit_symbol_code(self.game_controler, i)
             font_index = 0
             # symbol = 
             symbol = "U"
@@ -568,6 +888,37 @@ class GameWindowClass:
         self.draw_bottom(surface)
         self.draw_side(surface)
 
+    def get_clicked_object(self, mouse_pos):
+
+        if self.next_turn_rect.collidepoint(mouse_pos):
+            return {
+                "type": "next_turn"
+            }
+        
+        if self.null_block_rect.collidepoint(mouse_pos):
+            return {
+                "type": None
+            }
+
+        unit_id = self.get_clicked_unit(mouse_pos, self.unit_number)
+
+        if unit_id is not None:
+            return {
+                "type": "unit",
+                "id": unit_id
+            }
+
+        province = self.get_clicked_province(mouse_pos)
+
+        if province is not None:
+            return {
+                "type": "province",
+                "id": province["ID"],
+                "object": province
+            }
+
+        return None
+
     def runGame(self):
         background = pygame.Surface(self.screenSize, pygame.SRCALPHA) 
 
@@ -588,21 +939,27 @@ class GameWindowClass:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                if event.type == pygame.QUIT:
-                    running = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    province = self.get_clicked_province(event.pos)
-                
-                    clicked = self.get_clicked_unit(pygame.mouse.get_pos(), self.unit_number)
+                    clicked = self.get_clicked_object(event.pos)
 
                     if clicked is not None:
-                        print("kliknięto unit:", clicked)
-                    if (province is not None):
-                        print("Province ID =", province["ID"])
-                        self.glow = province
-                    if self.next_turn_clicked(event.pos):
-                        print("NEXT TURN")
+
+                        self.clicked = clicked
+                        self.glow = None
+
+                        if clicked["type"] == "unit":
+                            print("Unit:", self.clicked["id"])
+
+                        elif clicked["type"] == "province":
+                            self.glow = self.clicked["object"]
+                            print("Province:", clicked["id"])
+
+                        elif clicked["type"] == "next_turn":
+                            print("NEXT TURN")
+                        
+                        elif clicked["type"] == None:
+                            print("Null")
                     
 
             self.draw_game(self.viewSurface)
