@@ -31,4 +31,18 @@ class Province():
 
     def get_hexagons_list(self):
         return self.hexagons_list
+    
+    def get_attack(self):
+        attack = 0
+
+
+
+        return attack
+    
+    def get_defence(self):
+        attack = 0
+
+
+
+        return attack
 

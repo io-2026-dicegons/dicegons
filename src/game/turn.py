@@ -17,9 +17,11 @@ class Turn:
         self.turn_phase = self.turn_phase + 1
 
         if self.turn_phase == LAST_PHASE:
+            self.turn_phase = 0
             self.turn_player = self.turn_player + 1
 
             if self.turn_player == self.number_of_players:
+                self.turn_player = 0
                 self.turn_number = self.turn_number + 1
                 return True
         return False

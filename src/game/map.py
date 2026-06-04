@@ -20,7 +20,7 @@ class Map:
     def get_province_list(self):
         return self.province_list
     
-    def check_provine_by_id(self, provine_id):
+    def check_province_by_id(self, provine_id):
         if self.province_list[ provine_id ] == None:
-            return True
-        return False
+            return False
+        return True
