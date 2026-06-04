@@ -18,7 +18,7 @@ class Province():
         self.army = army
 
     def set_terrain(self, terrain):
-        self.terrain = terrain;
+        self.terrain = terrain
     
     def set_building(self, building):
         self.building = building

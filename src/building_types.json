@@ -2,7 +2,7 @@
     "building_types":
     [
         {
-            "name": "Placeholder",
+            "name": "Nothing",
             "id": 0,
             "defence_modifier": 0,
             "income_modifier": 0

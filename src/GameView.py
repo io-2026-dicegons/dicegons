@@ -5,6 +5,7 @@ import json
 #importy
 from game.resourceManager import ResourceManager
 from game.game_controller import GameController
+from game.scenario_creator import ScenarioCreator
 
 
 #komentarze sa po to bo mam wrazenier ze nie ogarne kodu sam zaraz a co dopiero wy
@@ -22,6 +23,10 @@ class GameWindowClass:
         self.resource_manager = ResourceManager()
         self.resource_manager.load_definitions()
         self.game_controler = GameController(self.resource_manager)
+
+        self.scenario_loader = ScenarioCreator()
+        self.game_controler = self.scenario_loader.scenario_1(self.game_controler)
+
         
             
         # statystyki hexow
@@ -41,7 +46,6 @@ class GameWindowClass:
 
         self.clicked = None
 
-        self.unit_number = 3
 
 
         # tutaj jest system od skalowania mapy bo bez tego to strasznie spixelizowane bylo
@@ -69,9 +73,15 @@ class GameWindowClass:
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("IOIOIOIO")
         
+        test = []
 
+        provinces = self.game_controler.map.get_province_list()
+        for i in provinces:
+            test += self.game_controler.get_province_hex_list(i)
+            # print(self.game_controler.get_province_hex_list(i))
 
-        
+        # print(test)
+
 
         with open("scenario_one.json") as f:
             scenario_data = json.load(f)
@@ -95,7 +105,6 @@ class GameWindowClass:
 
         pygame.draw.polygon(surface, color, points, width)
         
-
     def draw_border_hex(self, surface, color, width, position, edge):  # borders for hexes
         #     0
         #  1 / \ 5
@@ -195,8 +204,12 @@ class GameWindowClass:
 
         pygame.draw.polygon(surface, color, subpoints, width)
 
+
     def draw_player_border(self, surface, player_hex_list, province_number, color, width, size):
         hex_list = player_hex_list[province_number]
+        # print(player_hex_list, province_number)
+
+        # self.game_controler.get_player_hexes()
 
         for [i, j] in hex_list:
             w = math.sqrt(3) * self.hex_size
@@ -406,6 +419,9 @@ class GameWindowClass:
         pygame.draw.polygon(self.viewSurface, self.waterColor, [[self.startX, self.startY], [self.startX, self.viewSize[1]], [self.viewSize[0], self.viewSize[1]], [self.viewSize[0], self.startY]], 0)
         
         self.draw_full_map(surface, self.waterColor, 0)
+
+
+
         #tworzy prowincje
         for province in self.provinces:
             self.draw_province(surface, province)
@@ -423,6 +439,11 @@ class GameWindowClass:
 
         player_provinces = [test, test2, test3]
 
+        player_list = self.game_controler.player_list
+        print(player_list.items())
+        for i in player_list.items():
+            pass #print(self.game_controler.get_player_hexes(i))
+            
         self.draw_player_stuff(surface, player_provinces, (255, 0, 0, 255))
         
 
@@ -546,6 +567,7 @@ class GameWindowClass:
         
         if(self.clicked == None):
             return 
+        
 
         showed_object = self.clicked
 
@@ -553,7 +575,7 @@ class GameWindowClass:
         if( showed_object["type"] == 'unit' ):
             offset = 25
 
-            print(self.clicked["id"])
+            # print(self.clicked["id"])
 
             symbol = "U"
 
@@ -654,9 +676,19 @@ class GameWindowClass:
             surface.blit(text_player, text_player_rect)
 
 
-            terrain_id = showed_object["id"]
+            province_id = showed_object["id"]
+
+            # print(province_id)
+
+            terrain_id = self.game_controler.get_province_terrain(province_id)
+            # print(terrain_id)
+            
+            color = self.resource_manager.get_terrain_by_id(1).color
+            # print(color)
+   
+
             # view_symbol_color = self.resource_manager.get_terrain_by_id(terrain_id).color
-            view_symbol_color = "red"
+            view_symbol_color = color
             view_symbol_border = "black"
 
             symbol_size = font_size + 16
@@ -859,11 +891,24 @@ class GameWindowClass:
 
         pygame.draw.polygon(surface, color, points, 0)
 
-        for i in range (1, self.unit_number + 1):
+        unit_types = self.resource_manager.get_unit_types()
+
+        unit_number = 0
+        for i in unit_types:
+            unit_number += 1
+
+        # print(self.resource_manager.get_unit_by_id(0).name)
+
+
+
+        for i in range (0, unit_number):
             # font_index = self.game_controler.get_unit_symbol_code(self.game_controler, i)
-            font_index = 0
-            # symbol = 
+            
             symbol = "U"
+            font_index = 0
+
+            # font_index = self.game_controler.get_unit_symbol_code(i)
+            # symbol = self.game_controler.get_unit_symbol(i)
 
             if(font_index == 0):
                 font = pygame.font.SysFont("webdings", font_size)  
@@ -877,8 +922,7 @@ class GameWindowClass:
             text_symbol = font.render(symbol, True, "Black", None)
             text_symbol_rect = text_symbol.get_rect()
 
-
-            position = ((points[0][0] + i* size[0]/(self.unit_number + 1),  points[0][1] - size[1]/2))
+            position = ((points[0][0] + (i + 1) * size[0]/(unit_number + 1),  points[0][1] - size[1]/2))
 
             text_symbol_rect.center = position
             pygame.draw.rect(surface, gradient_color, text_symbol_rect, 0)
@@ -900,7 +944,12 @@ class GameWindowClass:
                 "type": None
             }
 
-        unit_id = self.get_clicked_unit(mouse_pos, self.unit_number)
+        unit_types = self.resource_manager.get_unit_types()
+        unit_number = 0
+        for i in unit_types:
+            unit_number += 1
+
+        unit_id = self.get_clicked_unit(mouse_pos, unit_number)
 
         if unit_id is not None:
             return {
@@ -927,8 +976,6 @@ class GameWindowClass:
 
         while running:
 
-            unit_number = 3
-
             self.viewSurface.blit(background, (self.startX, self.startY))
             self.gameWindow.blit(self.viewSurface, (0,0))
 
@@ -953,6 +1000,7 @@ class GameWindowClass:
 
                         elif clicked["type"] == "province":
                             self.glow = self.clicked["object"]
+                            # print(clicked["object"])
                             print("Province:", clicked["id"])
 
                         elif clicked["type"] == "next_turn":
