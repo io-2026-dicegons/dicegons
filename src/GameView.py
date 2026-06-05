@@ -27,7 +27,7 @@ class GameWindowClass:
         self.scenario_loader = ScenarioCreator()
         self.game_controler = self.scenario_loader.scenario_1(self.game_controler)
 
-        
+        self.error = False
             
         # statystyki hexow
         self.scale = 1
@@ -45,8 +45,6 @@ class GameWindowClass:
         self.font = "Times new roman"
 
         self.clicked = None
-
-
 
         # tutaj jest system od skalowania mapy bo bez tego to strasznie spixelizowane bylo
         self.hex_number_x = hex_unscaled_number_x 
@@ -73,14 +71,14 @@ class GameWindowClass:
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("IOIOIOIO")
         
-        test = []
+        self.all_provinces = []
 
         provinces = self.game_controler.map.get_province_list()
         for i in provinces:
-            test += self.game_controler.get_province_hex_list(i)
+            self.all_provinces += self.game_controler.get_province_hex_list(i)
             # print(self.game_controler.get_province_hex_list(i))
 
-        # print(test)
+        # print(self.all_provinces)
 
 
         with open("scenario_one.json") as f:
@@ -374,14 +372,20 @@ class GameWindowClass:
             # self.draw_province_border_hex(surface, "red", width, (self.start_draw_pos[0] + x_offset, self.start_draw_pos[1] + y_offset), [1, 2], 1/3)
 
 
-    def draw_province(self, surface, province):
-        province_hexes = province["hexList"]
-        terrain_id = province["terrain_ID"]
+    def draw_province(self, surface, province_id):
+        # province_hexes = province["hexList"]
+        province_hexes = self.game_controler.get_province_hex_list(province_id)
+        
+        # print(province_hexes)
+
+        # self.error = True
+        # terrain_id = province["terrain_ID"]
+        terrain_id = self.game_controler.get_province_terrain(province_id)
 
         color = self.resource_manager.get_terrain_by_id(terrain_id).color
 
         self.draw_map(surface, province_hexes, color, 0)
-        if(self.glow == province):
+        if(self.glow == province_hexes):
             # print(color)
             self.draw_map(surface, province_hexes, self.glow_color, 0)
             
@@ -413,20 +417,37 @@ class GameWindowClass:
         return [i, j]
 
 
-
-
     def draw_game(self, surface):
         pygame.draw.polygon(self.viewSurface, self.waterColor, [[self.startX, self.startY], [self.startX, self.viewSize[1]], [self.viewSize[0], self.viewSize[1]], [self.viewSize[0], self.startY]], 0)
         
         self.draw_full_map(surface, self.waterColor, 0)
 
 
-
         #tworzy prowincje
-        for province in self.provinces:
-            self.draw_province(surface, province)
+
+        packed_all_provinces = []
 
 
+        all_provinces = self.game_controler.get_player_provinces(1)
+        all_provinces += self.game_controler.get_player_provinces(2)
+
+        # print(all_provinces)
+
+        for i in range (2):
+            packed_all_provinces  += [self.game_controler.get_player_hexes(i+1)]
+
+
+        # print(self.game_controler.get_player_list())
+
+
+        for i in range(len(all_provinces)):
+            self.draw_province(surface, i)
+            
+        # print(all_provinces)
+        # self.error = True
+
+
+        
 
         test = [[0,0],[1,0],[1,1], [0,1]]
         test2 = [[2,2],[2,1], [2,3], [3,2], [1, 2]]
@@ -437,19 +458,18 @@ class GameWindowClass:
         # z kazdej prowincji biore liste hexow
         # i lista hexow to jest np test2
 
-        player_provinces = [test, test2, test3]
 
-        player_list = self.game_controler.player_list
-        print(player_list.items())
-        for i in player_list.items():
-            pass #print(self.game_controler.get_player_hexes(i))
-            
-        self.draw_player_stuff(surface, player_provinces, (255, 0, 0, 255))
-        
+        for i in range (2):
+            playerHexes = [self.game_controler.get_player_hexes(i+1)]
+            if(i == 1):
+                color = (255, 0, 0)
+            else:
+                color = (127, 0, 255)
+            self.draw_player_stuff(surface, playerHexes, color)
 
         # self.draw_building(self.viewSurface, "l", 0 , test) #<------------------------------------------
         # print(self.game_controler.get_province_building( 0 ))
-        self.draw_army(surface, "U", 0, 13 , "P", 1, 4, test)
+        # self.draw_army(surface, "U", 0, 13 , "P", 1, 4, test)
 
     def draw_turn_block(self, surface):
         color = "gray"
@@ -872,9 +892,13 @@ class GameWindowClass:
 
     def get_clicked_province(self, mouse_pos):
         clicked_hex = self.pixel_to_hex(mouse_pos)
+        print(clicked_hex)
+        
+
 
         for province in self.provinces:
             if clicked_hex in province["hexList"]:
+            
                 return province
 
         return None
@@ -982,6 +1006,8 @@ class GameWindowClass:
             # draw GUI directly on gameWindow
             # self.draw_bottom(self.gameWindow)
 
+            # print(self.game_controler.get_player_hexes(2))
+
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -1017,6 +1043,9 @@ class GameWindowClass:
             self.gameWindow.blit(scaled, (0, 0))
             pygame.display.update()
             self.clock.tick(60)
+            
+            if( self.error == True):
+                break
             
         pygame.quit()
 

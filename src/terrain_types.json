@@ -13,7 +13,7 @@
             "id": 1,
             "defence_modifier": 0,
             "income_modifier": 2,
-            "color": [0, 255, 0, 255]
+            "color": [0, 150, 0, 255]
         },
         {
             "terrain_name": "Mountains",
