@@ -46,6 +46,4 @@ class ScenarioCreator:
 
                 game_controller.map.add_province( province )
 
-        game_controller
-
         return game_controller

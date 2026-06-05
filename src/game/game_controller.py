@@ -22,9 +22,9 @@ class GameController:
 
     def get_player_hexes(self, player_id):
         heks = []
-        for p in self.map.get_province_list():
-            if p.player_id == player_id:
-                for h in p.get_hexagons_list():
+        for province_id, province in self.map.get_province_list().items():
+            if province.player_id == player_id:
+                for h in province.get_hexagons_list():
                     heks.append( h )
         
         return heks
