@@ -65,7 +65,7 @@ class GameController:
         return self.resource_manager.get_unit_by_id( unit_id ).attack_dice
     
     def get_unit_defence_dice(self, unit_id):
-        return self.resource_manager.get_unit_by_id( unit_id ).defence_dice
+        return self.resource_manager.get_unit_by_id( unit_id ).defensive_dice
     
     def get_unit_price(self, unit_id):
         return self.resource_manager.get_unit_by_id( unit_id ).price

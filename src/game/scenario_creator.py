@@ -42,7 +42,11 @@ class ScenarioCreator:
                 province.set_army( army )
 
                 province.building = 1
-                province.terrain = 1
+                if( i % 2 == 0 ):
+                    province.terrain = 1
+                else:
+                    province.terrain = 2
+
 
                 game_controller.map.add_province( province )
 
