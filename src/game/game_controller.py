@@ -19,6 +19,16 @@ class GameController:
     #funkcje UI get
     def get_player_list(self):
         return self.player_list
+    
+    def get_player_provinces(self,player_id):
+        provinces_id_list = []
+
+        for province_id, province in self.map.get_province_list().items():
+            if province.player_id == player_id:
+                provinces_id_list.append( province_id )
+
+        return provinces_id_list
+
 
     def get_player_hexes(self, player_id):
         heks = []

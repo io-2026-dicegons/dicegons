@@ -143,3 +143,11 @@ def test_game_get_player_hexes( game_controller ):
 def test_game_get_player_hexes_wrong_player_id( game_controller ):
     hexagons_list = game_controller.get_player_hexes( 0 )
     assert len( hexagons_list ) == 0
+
+def test_game_get_player_provinces( game_controller ):
+    provinces_id_list = game_controller.get_player_provinces( 1 )
+    assert len( provinces_id_list ) == 50
+
+def test_game_get_player_provinces_wrong_player_id( game_controller ):
+    provinces_id_list = game_controller.get_player_provinces( 0 )
+    assert len( provinces_id_list ) == 0
