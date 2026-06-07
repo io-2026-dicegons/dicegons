@@ -2,7 +2,8 @@
 class UnitType:
     def __init__(self, id_unit_type=0, name="Placeholder", attack_dice=0, attack_modifier=0, defensive_dice=0, 
     defense_modifier=0, max_quantity=1, price =0, max_defensive_result = None, 
-    min_defensive_result  = None, max_offensive_result  = None, min_offensive_result = None):
+    min_defensive_result  = None, max_offensive_result  = None, min_offensive_result = None,
+    symbol = None, symbol_code = 0):
         self.id_unit_type = id_unit_type
         self.name = name
         self.attack_dice = attack_dice
@@ -15,7 +16,6 @@ class UnitType:
         self.min_defensive_result = min_defensive_result
         self.max_offensive_result = max_offensive_result
         self.min_offensive_result = min_offensive_result
-        
         if self.max_defensive_result is None:
             self.max_defensive_result = self.defensive_dice + self.defense_modifier
         if self.max_offensive_result is None:
@@ -23,7 +23,9 @@ class UnitType:
         if self.min_defensive_result is None:
             self.min_defensive_result = 1 + self.defense_modifier
         if self.min_offensive_result is None:
-            self.min_offensive_result = 1 + self.attack_modifier                   
+            self.min_offensive_result = 1 + self.attack_modifier
+        self.symbol = symbol
+        self.symbol_code = symbol_code
 
     # consider change: GetID->get_id:
     def GetID(self):        

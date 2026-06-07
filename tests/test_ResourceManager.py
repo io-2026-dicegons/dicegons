@@ -24,7 +24,9 @@ def test_load_single_unit (tmp_path):
           "Max_Obronny_Rzut": 2,
           "Min_Obronny_Rzut": 0,
           "Max_Atakujacy_Rzut": 2,
-          "Min_Atakujacy_Rzut": 0
+          "Min_Atakujacy_Rzut": 0,
+          "symbol": "D",
+          "symbol_code": 0
         }
       ]
     }
@@ -46,6 +48,8 @@ def test_load_single_unit (tmp_path):
     assert loaded_unit.GetDefenseModifier() == 0
     assert loaded_unit.GetMaxQuantity() == 100
     assert loaded_unit.GetPrice() == 50
+    assert loaded_unit.symbol == 'D'
+    assert loaded_unit.symbol_code == 0    
     
 
 
@@ -67,7 +71,9 @@ def rs_with_multiple_units (tmp_path):
           "Max_Obronny_Rzut": 6,
           "Min_Obronny_Rzut": 3,
           "Max_Atakujacy_Rzut": 6,
-          "Min_Atakujacy_Rzut": 3
+          "Min_Atakujacy_Rzut": 3,
+          "symbol": "A",
+          "symbol_code": 0
         },
         {
           "ID_Typu_Jednostki": 2,
@@ -81,7 +87,9 @@ def rs_with_multiple_units (tmp_path):
           "Max_Obronny_Rzut": 2,
           "Min_Obronny_Rzut": 0,
           "Max_Atakujacy_Rzut": 2,
-          "Min_Atakujacy_Rzut": 0
+          "Min_Atakujacy_Rzut": 0,
+          "symbol": "B",
+          "symbol_code": 0
         }
         
       ]
@@ -92,7 +100,7 @@ def rs_with_multiple_units (tmp_path):
     rm.load_unit_types(file)
     return rm
 
-def test_load_multiple_units (rs_with_multiple_units):
+def test_load_correct_number_of_units (rs_with_multiple_units):
     rm = rs_with_multiple_units
     
     assert rm.get_unit_types() != None, "Expected at least some units loaded - get_unit_types() should not return None"
@@ -131,7 +139,9 @@ def test_load_several_units (rs_with_multiple_units):
     assert loaded_unit.GetDefenseModifier() == 3
     assert loaded_unit.GetMaxQuantity() == 300
     assert loaded_unit.GetPrice() == 30    
-    
+    assert loaded_unit.symbol == 'A'
+    assert loaded_unit.symbol_code == 0  
+
     loaded_unit2 = rm.get_unit_by_id(2)
     assert loaded_unit2.GetName() == "Peasant" # only ids should be unique
     assert loaded_unit2.GetID() == 2
@@ -141,6 +151,8 @@ def test_load_several_units (rs_with_multiple_units):
     assert loaded_unit2.GetDefenseModifier() == 0
     assert loaded_unit2.GetMaxQuantity() == 100
     assert loaded_unit2.GetPrice() == 50 
+    assert loaded_unit2.symbol == 'B'
+    assert loaded_unit2.symbol_code == 0  
 
 
 def test_load_empty_unit_file (tmp_path):
@@ -199,7 +211,9 @@ def test_load_single_building (tmp_path):
           "name": "TestBuilding",
           "id": 0,
           "defence_modifier": 1,
-          "income_modifier": 2
+          "income_modifier": 2,
+          "symbol": "A",
+          "symbol_code": 2
         }
       ]
     }
@@ -218,6 +232,8 @@ def test_load_single_building (tmp_path):
     assert loaded_bulding.id == 0
     assert loaded_bulding.defence_modifier == 1
     assert loaded_bulding.income_modifier == 2
+    assert loaded_bulding.symbol == 'A'
+    assert loaded_bulding.symbol_code == 2
 
 
 @pytest.fixture
@@ -231,13 +247,17 @@ def rs_with_multiple_buildings (tmp_path):
           "name": "TestBuilding",
           "id": 1,
           "defence_modifier": 1,
-          "income_modifier": 2
+          "income_modifier": 2,
+          "symbol": "A",
+          "symbol_code": 0
         },
         {
           "name": "TestBuilding2",
           "id": 2,
           "defence_modifier": 3,
-          "income_modifier": 4
+          "income_modifier": 4,
+          "symbol": "B",
+          "symbol_code": 1
         }
       ]
     }
@@ -247,7 +267,7 @@ def rs_with_multiple_buildings (tmp_path):
     rm.load_building_types(file)
     return rm
 
-def test_load_buildings (rs_with_multiple_buildings):    
+def test_load_correct_number_of_buildings (rs_with_multiple_buildings):    
     rm = rs_with_multiple_buildings
     msg = "Expected at least some buildings loaded - get_building_types() should not return None"
     assert rm.get_building_types() != None, msg
@@ -283,14 +303,16 @@ def test_get_building_by_id (rs_with_multiple_buildings):
     assert loaded_bulding1.id == 1
     assert loaded_bulding1.defence_modifier == 1
     assert loaded_bulding1.income_modifier == 2
-
+    assert loaded_bulding1.symbol == 'A'
+    assert loaded_bulding1.symbol_code == 0
 
     loaded_bulding2 = rm.get_building_by_id(2)
     assert loaded_bulding2.name == "TestBuilding2"
     assert loaded_bulding2.id == 2
     assert loaded_bulding2.defence_modifier == 3
     assert loaded_bulding2.income_modifier == 4
-
+    assert loaded_bulding2.symbol == 'B'
+    assert loaded_bulding2.symbol_code == 1
 
     
 def test_load_single_terrain (tmp_path):

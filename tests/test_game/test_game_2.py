@@ -53,19 +53,25 @@ def game_controller( tmp_path ):
                 "name": "Placeholder",
                 "id": 0,
                 "defence_modifier": 0,
-                "income_modifier": 0
+                "income_modifier": 0,
+                "symbol": "",
+                "symbol_code": 0  
             },
             {
                 "name": "Wall",
                 "id": 1,
                 "defence_modifier": 3,
-                "income_modifier": 0
+                "income_modifier": 0,
+                "symbol": "W",
+                "symbol_code": 0                             
             },
             {
                 "name": "Farms",
                 "id": 2,
                 "defence_modifier": 0,
-                "income_modifier": 3
+                "income_modifier": 3,
+                "symbol": "F",
+                "symbol_code": 0
             }        
         ]
     }

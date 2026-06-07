@@ -23,7 +23,9 @@ def test_scenario_1( tmp_path ):
           "Max_Obronny_Rzut": 6,
           "Min_Obronny_Rzut": 3,
           "Max_Atakujacy_Rzut": 6,
-          "Min_Atakujacy_Rzut": 3
+          "Min_Atakujacy_Rzut": 3,
+          "symbol": "A",
+          "symbol_code": 0
         },
         {
           "ID_Typu_Jednostki": 2,
@@ -37,7 +39,9 @@ def test_scenario_1( tmp_path ):
           "Max_Obronny_Rzut": 2,
           "Min_Obronny_Rzut": 0,
           "Max_Atakujacy_Rzut": 2,
-          "Min_Atakujacy_Rzut": 0
+          "Min_Atakujacy_Rzut": 0,
+          "symbol": "A",
+          "symbol_code": 0
         }
         
       ]
@@ -54,19 +58,25 @@ def test_scenario_1( tmp_path ):
                 "name": "Placeholder",
                 "id": 0,
                 "defence_modifier": 0,
-                "income_modifier": 0
+                "income_modifier": 0,
+                "symbol": "",
+                "symbol_code": 0
             },
             {
                 "name": "Wall",
                 "id": 1,
                 "defence_modifier": 3,
-                "income_modifier": 0
+                "income_modifier": 0,
+                "symbol": "W",
+                "symbol_code": 0                             
             },
             {
                 "name": "Farms",
                 "id": 2,
                 "defence_modifier": 0,
-                "income_modifier": 3
+                "income_modifier": 3,
+                "symbol": "F",
+                "symbol_code": 0                             
             }        
         ]
     }

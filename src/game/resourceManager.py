@@ -44,7 +44,9 @@ class ResourceManager:
                         max_defensive_result = item["Max_Obronny_Rzut"],
                         min_defensive_result = item["Min_Obronny_Rzut"],
                         max_offensive_result = item["Max_Atakujacy_Rzut"],
-                        min_offensive_result = item["Min_Atakujacy_Rzut"]
+                        min_offensive_result = item["Min_Atakujacy_Rzut"],
+                        symbol = item["symbol"],
+                        symbol_code = item["symbol_code"]
                     )
                     self.unit_types[current.id_unit_type] = current
             except KeyError:
@@ -73,7 +75,9 @@ class ResourceManager:
                         name = item["name"],
                         id = item["id"],
                         defence_modifier = item["defence_modifier"],
-                        income_modifier = item["income_modifier"]
+                        income_modifier = item["income_modifier"],
+                        symbol = item["symbol"],
+                        symbol_code = item["symbol_code"]
                     )
                     self.building_types[current.id] = current
             except KeyError:
