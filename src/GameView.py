@@ -40,7 +40,7 @@ class GameWindowClass:
         self.waterColor = GameController.get_terrain_color(self, 0)
 
         self.glow = None
-        self.glow_color = [150, 150, 150, 10]
+        self.glow_color = [150, 150, 150, 3]
         
         self.font = "Times new roman"
 
@@ -73,12 +73,15 @@ class GameWindowClass:
         
         self.all_provinces = []
 
-        provinces = self.game_controler.map.get_province_list()
-        for i in provinces:
-            self.all_provinces += self.game_controler.get_province_hex_list(i)
-            # print(self.game_controler.get_province_hex_list(i))
+        # provinces = self.game_controler.map.get_province_list()
+        # # for i in provinces:
+        # #     self.all_provinces += self.game_controler.get_province_hex_list(i)
+        # #     # print(self.game_controler.get_province_hex_list(i))
 
         # print(self.all_provinces)
+
+        self.all_provinces = self.game_controler.get_player_provinces(1)
+        self.all_provinces += self.game_controler.get_player_provinces(2)
 
 
         with open("scenario_one.json") as f:
@@ -371,6 +374,17 @@ class GameWindowClass:
             self.draw_hex( surface, color, width, (self.start_draw_pos[0] + x_offset, self.start_draw_pos[1] + y_offset))
             # self.draw_province_border_hex(surface, "red", width, (self.start_draw_pos[0] + x_offset, self.start_draw_pos[1] + y_offset), [1, 2], 1/3)
 
+    def draw_glow(self, surface):
+        # print(self.all_provinces)
+        # print(self.glow)
+        for i in self.all_provinces:
+            # print(i)
+            if(self.glow == i):
+            # print(color)
+                province_hexes = self.game_controler.get_province_hex_list(i)
+                self.draw_border_map(surface, province_hexes, "yellow", 4)
+
+
 
     def draw_province(self, surface, province_id):
         # province_hexes = province["hexList"]
@@ -385,9 +399,9 @@ class GameWindowClass:
         color = self.resource_manager.get_terrain_by_id(terrain_id).color
 
         self.draw_map(surface, province_hexes, color, 0)
-        if(self.glow == province_id):
-            # print(color)
-            self.draw_map(surface, province_hexes, self.glow_color, 0)
+        # if(self.glow == province_id):
+        #     # print(color)
+        #     self.draw_map(surface, province_hexes, self.glow_color, 0)
             
         self.draw_border_map(surface, province_hexes, "black", int(self.hex_size/8))
 
@@ -417,36 +431,35 @@ class GameWindowClass:
         return [i, j]
 
 
+
     def draw_game(self, surface):
         pygame.draw.polygon(self.viewSurface, self.waterColor, [[self.startX, self.startY], [self.startX, self.viewSize[1]], [self.viewSize[0], self.viewSize[1]], [self.viewSize[0], self.startY]], 0)
         
         self.draw_full_map(surface, self.waterColor, 0)
 
-
-        #tworzy prowincje
-
-        # packed_all_provinces = []
-
-
         all_provinces = self.game_controler.get_player_provinces(1)
         all_provinces += self.game_controler.get_player_provinces(2)
 
-        # print(all_provinces)
-
-        # for i in range (2):
-        #     packed_all_provinces  += [self.game_controler.get_player_hexes(i+1)]
-
-        # print(packed_all_provinces)
-        # print(self.game_controler.get_player_list())
-
-        # print(all_provinces)
         for i in all_provinces:
             self.draw_province(surface, i)
 
             squad_one_id = self.game_controler.get_army_squad_unit_type(i, 1)
             squad_two_id = self.game_controler.get_army_squad_unit_type(i, 2)
-            # self.game_controler.get_army_squad_stack()
-            # self.draw_army(surface, self.game_controler.unit
+
+            # print(squad_one_id, squad_two_id)
+            squad_one_symbol = self.game_controler.get_unit_symbol(squad_one_id)
+            squad_two_symbol = self.game_controler.get_unit_symbol(squad_two_id)
+
+            squad_one_code = self.game_controler.get_unit_symbol_code(squad_one_id)
+            squad_two_code = self.game_controler.get_unit_symbol_code(squad_two_id)    
+            
+            squad_one_stack = self.game_controler.get_army_squad_stack(i, 1)
+            squad_two_stack = self.game_controler.get_army_squad_stack(i, 2)
+
+            
+            self.draw_army(surface, squad_one_symbol, squad_one_code, squad_one_stack, squad_two_symbol, squad_two_code, squad_two_stack, self.game_controler.get_province_hex_list(i))
+
+            self.draw_building(surface, self.game_controler.get_province_building(i), self.game_controler.get_province_hex_list(i))
 
 
         for i in range (2):
@@ -490,13 +503,17 @@ class GameWindowClass:
         pygame.draw.polygon(surface, gradient_color, points_attack)
         pygame.draw.polygon(surface, color, points_move)
         
-        text_font = pygame.font.SysFont(self.font, font_size + 30, True ) 
+        text_font = pygame.font.SysFont(self.font, font_size + 18, True ) 
 
         text = ""
         if( turn_player == 0):
-            text = "Player A"
+            coin = 0
+            # coint = self.game_controler.get_player_gold(0)
+            text = "Pl.A G:" + str(coin)
         else:
-            text = "Player B"
+            coin = 10000
+            # coint = self.game_controler.get_player_gold(1)
+            text = "Pl.B G:" + str(coin)
 
         text_player = text_font.render(text, True, "Black")
         text_player_rect = text_player.get_rect(midleft = (points[0][0], (points[0][1] + points[3][1])/2))
@@ -526,7 +543,7 @@ class GameWindowClass:
         else: 
             arrow_points = (points_move[0][0], (points_move[0][1] + points_move[3][1]) / 2)
 
-        text_move = text_font.render("a", True, "Black")
+        text_move = text_font.render("a", True, "white")
         text_move_rect = text_move.get_rect(midright = arrow_points)
         surface.blit(text_move, text_move_rect)
 
@@ -586,7 +603,7 @@ class GameWindowClass:
         if( showed_object["type"] == 'unit' ):
             unit_id = showed_object["id"]
 
-            print(unit_id)
+            # print(unit_id)
             offset = 25
 
             # print(self.clicked["id"])
@@ -925,8 +942,9 @@ class GameWindowClass:
         for i in range (0, unit_number):
             # font_index = self.game_controler.get_unit_symbol_code(self.game_controler, i)
             
-            symbol = "U"
-            font_index = 0
+            symbol = self.game_controler.get_unit_symbol(i)
+            font_index = self.game_controler.get_building_symbol_code(i)
+
 
             # font_index = self.game_controler.get_unit_symbol_code(i)
             # symbol = self.game_controler.get_unit_symbol(i)
@@ -995,10 +1013,14 @@ class GameWindowClass:
 
         running = True
 
+        self.draw_game(self.viewSurface)
+
         while running:
 
             self.viewSurface.blit(background, (self.startX, self.startY))
             self.gameWindow.blit(self.viewSurface, (0,0))
+
+
 
             # draw GUI directly on gameWindow
             # self.draw_bottom(self.gameWindow)
@@ -1012,6 +1034,7 @@ class GameWindowClass:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     clicked = self.get_clicked_object(event.pos)
+                    self.draw_game(self.viewSurface)
 
                     if clicked is not None:
 
@@ -1032,8 +1055,8 @@ class GameWindowClass:
                         elif clicked["type"] == None:
                             print("Null")
                     
-
-            self.draw_game(self.viewSurface)
+            self.draw_glow(self.viewSurface)
+            
             self.draw_GUI(self.gameWindow)
             
             scaled = pygame.transform.smoothscale(self.viewSurface, self.viewSize)
@@ -1061,5 +1084,3 @@ gameWindow = None
 game = GameWindowClass( gameWindow , 0, 0, 1, 24, 20, 15)
 game.runGame()
 
-
-# lista wszystkich getow

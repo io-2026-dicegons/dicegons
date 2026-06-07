@@ -1,7 +1,7 @@
 {
   "unit_types": [
     {
-      "ID_Typu_Jednostki": 1,
+      "ID_Typu_Jednostki": 0,
       "name": "Peasant",
       "Atak_Kostka": 2,
       "Atak_Modifier": 1,
@@ -17,7 +17,7 @@
       "symbol_code": 0
     },
     {
-      "ID_Typu_Jednostki": 2,
+      "ID_Typu_Jednostki": 1,
       "name": "Knight",
       "Atak_Kostka": 3,
       "Atak_Modifier": 2,
