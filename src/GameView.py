@@ -5,6 +5,7 @@ import json
 #importy
 from game.resourceManager import ResourceManager
 from game.game_controller import GameController
+from game.turn import *
 from game.scenario_creator import ScenarioCreator
 
 
@@ -18,6 +19,10 @@ class GameWindowClass:
         self.hex_size = hex_size
         self.origin_X_hex_number = origin_X_hex_number
         self.origin_Y_hex_number = origin_Y_hex_number
+
+        self.province_clicked_1 = None
+        self.selected_unit_type = None
+        self.win = False
 
         # wczytywanie bazy danych
         self.resource_manager = ResourceManager()
@@ -481,9 +486,9 @@ class GameWindowClass:
 
         font_size = 16
         
-        turn_type = 0
+        turn_type = self.game_controler.turn.get_phase()
 
-        turn_player = 1
+        player_id = self.game_controler.get_current_player_id()
 
         size = [self.GUIsize[0], 75]
         points = [[self.startX + self.viewSize[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY], [self.startX + self.viewSize[0] + size[0], self.startY + size[1]], [self.startX + self.viewSize[0], self.startY + size[1]]]
@@ -505,15 +510,10 @@ class GameWindowClass:
         
         text_font = pygame.font.SysFont(self.font, font_size + 18, True ) 
 
-        text = ""
-        if( turn_player == 0):
-            coin = 0
-            # coint = self.game_controler.get_player_gold(0)
-            text = "Pl.A G:" + str(coin)
-        else:
-            coin = 10000
-            # coint = self.game_controler.get_player_gold(1)
-            text = "Pl.B G:" + str(coin)
+        #coin = 0
+        coin = self.game_controler.get_player_gold( player_id )
+        nick = self.game_controler.get_player_nick( player_id )
+        text = str(nick) + ": " + str(coin)
 
         text_player = text_font.render(text, True, "Black")
         text_player_rect = text_player.get_rect(midleft = (points[0][0], (points[0][1] + points[3][1])/2))
@@ -599,6 +599,40 @@ class GameWindowClass:
 
         showed_object = self.clicked
 
+        if( showed_object["type"] == 'battle' ):
+            attack = showed_object["attack"]
+            text_font = pygame.font.SysFont(self.font, name_font_size, True )
+
+            text_player = text_font.render("Wynik", True, "Black")
+            text_player_rect = text_player.get_rect(center = name_position )
+            surface.blit(text_player, text_player_rect)
+
+            symbol_size = font_size + 16
+            
+            text_font = pygame.font.SysFont(self.font, font_size, True )
+            positions = (self.viewSize[0] + 15, center[1] - 0.75 * line_size)
+
+            shift = 0.3
+
+            D_Mod = text_font.render("Atakujący: ", True, font_color)
+            D_Mod_rect = text_player.get_rect(midleft = positions )
+            surface.blit(D_Mod, D_Mod_rect)
+
+            D_Mod_Value = str( attack[0] )
+            D_Mod_Value_text = text_font.render(D_Mod_Value, True, font_color)
+            D_Mod_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(D_Mod_Value_text, D_Mod_Value_rect)
+
+            positions = (positions[0], positions[1] + shift * line_size)
+
+            Income = text_font.render("Obrońca", True, font_color)
+            Income_rect = text_player.get_rect(midleft = positions )
+            surface.blit(Income, Income_rect)
+
+            Income_Value = str( attack[1] )
+            Income_Value_text = text_font.render(Income_Value, True, font_color)
+            Income_Value_rect = text_player.get_rect(midleft = (positions[0] + 215, positions[1]) )
+            surface.blit(Income_Value_text, Income_Value_rect)
 
         if( showed_object["type"] == 'unit' ):
             unit_id = showed_object["id"]
@@ -912,7 +946,9 @@ class GameWindowClass:
         all_provinces += self.game_controler.get_player_provinces(2)
 
         for i in range(len(all_provinces)):
-            if( clicked_hex in self.game_controler.get_province_hex_list(i)):
+            province_hex_list = self.game_controler.get_province_hex_list(i)
+
+            if( clicked_hex in province_hex_list):
                 return i
             
         return None
@@ -1007,20 +1043,61 @@ class GameWindowClass:
 
         return None
 
+    def show_end( self, text ):
+        bg_color=(30, 30, 30)
+        text_color=(255, 255, 255)
+        font_size=50
+
+        surface = self.viewSurface
+        # Wypełnij tło jednym kolorem
+        surface.fill(bg_color)
+
+        # Utwórz font
+        font = pygame.font.SysFont(None, font_size)
+
+        # Renderuj tekst
+        rendered_text = font.render(text, True, text_color)
+
+        # Wyśrodkuj tekst
+        text_rect = rendered_text.get_rect(center=((self.viewSize[0] + self.GUIsize[0]) // 2, (self.viewSize[1] + self.GUIsize[1]) // 2))
+
+        # Narysuj tekst
+        surface.blit(rendered_text, text_rect)
+
+        # Odśwież ekran
+        pygame.display.update()
+
+        surface = self.gameWindow
+        # Wypełnij tło jednym kolorem
+        surface.fill(bg_color)
+
+        # Utwórz font
+        font = pygame.font.SysFont(None, font_size)
+
+        # Renderuj tekst
+        rendered_text = font.render(text, True, text_color)
+
+        # Wyśrodkuj tekst
+        text_rect = rendered_text.get_rect(center=(500 // 2, 500 // 2))
+
+        # Narysuj tekst
+        surface.blit(rendered_text, text_rect)
+
+        # Odśwież ekran
+        pygame.display.update()
+
     def runGame(self):
         background = pygame.Surface(self.screenSize, pygame.SRCALPHA) 
-
-
         running = True
 
         self.draw_game(self.viewSurface)
+        self.draw_glow(self.viewSurface)
+        self.draw_GUI(self.gameWindow)
 
         while running:
 
             self.viewSurface.blit(background, (self.startX, self.startY))
             self.gameWindow.blit(self.viewSurface, (0,0))
-
-
 
             # draw GUI directly on gameWindow
             # self.draw_bottom(self.gameWindow)
@@ -1029,12 +1106,16 @@ class GameWindowClass:
 
             
             for event in pygame.event.get():
+                
                 if event.type == pygame.QUIT:
                     running = False
 
+                if self.win:
+                    continue
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     clicked = self.get_clicked_object(event.pos)
-                    self.draw_game(self.viewSurface)
+                    
 
                     if clicked is not None:
 
@@ -1042,22 +1123,68 @@ class GameWindowClass:
                         self.glow = None
 
                         if clicked["type"] == "unit":
+                            self.selected_unit_type = self.clicked["id"]
+
                             print("Unit:", self.clicked["id"])
 
                         elif clicked["type"] == "province":
+
+                            unit_type = self.selected_unit_type
+                            province_from = self.province_clicked_1
+                            province_to = self.clicked["id"]
+
+                            if self.game_controler.turn.get_phase() == ATTACK_PHASE:
+                            
+                                if self.province_clicked_1 == None:
+                                    self.province_clicked_1 = self.clicked["id"]
+                                else:
+                                    result = self.game_controler.attack( province_from , province_to )
+
+                                    if( result != False ):
+                                        self.clicked["type"] = 'battle'
+                                        self.clicked["attack"] = result
+
+                                    self.province_clicked_1 = province_to
+
+                            elif self.game_controler.turn.get_phase() == BUYING_PHASE:
+                                
+                                if unit_type != None:
+                                    result = self.game_controler.buy_unit( unit_type, province_to )
+                                    print( unit_type, province_to, result )
+
+                            elif self.game_controler.turn.get_phase() == MOVEMENT_PHASE:
+
+                                if self.province_clicked_1 == None:
+                                    self.province_clicked_1 = self.clicked["id"]
+                                else:
+                                    #self.game_controler.move( province_from, 1, province_to, 1 )
+
+                                    print( "move:", province_from, province_to )
+                                    self.province_clicked_1 = province_to
+
                             self.glow = self.clicked["id"]
                             # print(clicked["object"])
                             print("Province:", clicked["id"])
 
                         elif clicked["type"] == "next_turn":
+                            self.game_controler.next_phase()
                             print("NEXT TURN")
+                            self.province_clicked_1 = None
+                            self.selected_unit_type = None
                         
                         elif clicked["type"] == None:
                             print("Null")
-                    
-            self.draw_glow(self.viewSurface)
-            
-            self.draw_GUI(self.gameWindow)
+
+                    self.draw_game(self.viewSurface)
+                    self.draw_glow(self.viewSurface)
+                    self.draw_GUI(self.gameWindow)
+
+                    self.win = self.game_controler.check_win()
+
+                    if self.win:
+                        player_id = self.game_controler.get_current_player_id()
+                        player_nick = self.game_controler.player_list[ player_id ].nick
+                        self.show_end( "Wygrał gracz: " + str(player_nick) )
             
             scaled = pygame.transform.smoothscale(self.viewSurface, self.viewSize)
             self.gameWindow.blit(scaled, (0, 0))

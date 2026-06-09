@@ -19,8 +19,19 @@ class GameController:
         self.roll = Roll()
 
     #funkcje UI get
+
+    def get_current_player_id(self):
+        player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
+        return player_id
+
     def get_player_list(self):
         return self.player_list
+    
+    def get_player_gold( self, player_id ):
+        return self.player_list[ player_id ].gold
+    
+    def get_player_nick( self, player_id ):
+        return self.player_list[ player_id ].nick
     
     def get_player_provinces(self,player_id):
         provinces_id_list = []
@@ -54,10 +65,22 @@ class GameController:
     
 
     def get_unit_symbol(self, unit_id):
-        return self.resource_manager.get_unit_by_id( unit_id ).symbol
+
+        unit_type = self.resource_manager.get_unit_by_id( unit_id )
+
+        if unit_type == None:
+            return ''
+
+        return unit_type.symbol
     
     def get_unit_symbol_code(self, unit_id):
-        return self.resource_manager.get_unit_by_id( unit_id ).symbol_code
+
+        unit_type = self.resource_manager.get_unit_by_id( unit_id )
+
+        if unit_type == None:
+            return ''
+
+        return unit_type.symbol_code
     
     def get_unit_max_stack(self, unit_id):
         return self.resource_manager.get_unit_by_id( unit_id ).max_quantity
@@ -94,11 +117,19 @@ class GameController:
     def get_army_squad_stack(self, province_id, squad_nr ):
         army = self.map.province_list[ province_id ].army
         squad = army.get_squad( squad_nr )
+
+        if squad == None:
+            return ''
+
         return squad.quantity
     
     def get_army_squad_unit_type(self, province_id, squad_nr ):
         army = self.map.province_list[ province_id ].army
         squad = army.get_squad( squad_nr )
+
+        if squad == None:
+            return None
+
         return squad.squad_type
     
     def get_province_hex_list(self, province_id):
@@ -214,20 +245,24 @@ class GameController:
         
         province = self.map.province_list[ province_from ]
         army = province.army
-        squad_1 = army.get_squad(1)
-        squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
-        squad_2 = army.get_squad(2)
-        squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
-
         attack = 0
+        squad_1 = army.get_squad(1)
+        squad_2 = army.get_squad(2)
 
-        for i in range(1, squad_1.quantity+1):
-            unit_attack = self.roll.roll_dice( squad_1_type.attack_dice )
-            attack += unit_attack
+        if squad_1 != None:
 
-        for i in range(1, squad_2.quantity+1):
-            unit_attack = self.roll.roll_dice( squad_2_type.attack_dice )
-            attack += unit_attack
+            squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
+
+            for i in range(1, squad_1.quantity+1):
+                unit_attack = self.roll.roll_dice( squad_1_type.attack_dice )
+                attack += unit_attack
+        
+        if squad_2 != None:
+            squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
+
+            for i in range(1, squad_2.quantity+1):
+                unit_attack = self.roll.roll_dice( squad_2_type.attack_dice )
+                attack += unit_attack
 
         return attack
     
@@ -235,22 +270,28 @@ class GameController:
         
         province = self.map.province_list[ province_from ]
         army = province.army
-        squad_1 = army.get_squad(1)
-        squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
-        squad_2 = army.get_squad(2)
-        squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
         terrain_modifier = self.resource_manager.get_terrain_by_id( province.terrain ).defence_modifier
         building_modifier = self.resource_manager.get_building_by_id( province.building ).defence_modifier
-
         defence = 0
 
-        for i in range(1,squad_1.quantity+1):
-            unit_defence = self.roll.roll_dice( squad_1_type.attack_dice ) + terrain_modifier + building_modifier
-            defence += unit_defence
+        squad_1 = army.get_squad(1)
 
-        for i in range(1,squad_2.quantity+1):
-            unit_defence = self.roll.roll_dice( squad_2_type.attack_dice ) + terrain_modifier + building_modifier
-            defence += unit_defence
+        if squad_1 != None:
+
+            squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
+            for i in range(1,squad_1.quantity+1):
+                unit_defence = self.roll.roll_dice( squad_1_type.attack_dice ) + terrain_modifier + building_modifier
+                defence += unit_defence
+
+        squad_2 = army.get_squad(2)
+
+        if squad_2 != None:
+
+            squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
+
+            for i in range(1,squad_2.quantity+1):
+                unit_defence = self.roll.roll_dice( squad_2_type.attack_dice ) + terrain_modifier + building_modifier
+                defence += unit_defence
 
         return defence
 
@@ -261,28 +302,34 @@ class GameController:
 
         #czy jest faza ataku
         if not self.turn.get_phase() == ATTACK_PHASE:
+            print("Nieprawidłowa faza")
             return False
         
         #czy province_from istnieje
         if not self.map.check_province_by_id( province_from ):
+            print("province_from nie istnieje")
             return False
 
         #czy province_to istnieje
         if not self.map.check_province_by_id( province_to ):
+            print("province_to nie istnieje")
             return False
 
         #czy province_from należy do gracza który teraz wykonuje ruch
         attacker = self.map.province_list[ province_from ].player_id
         if player_id != attacker :
+            print("province_from to nie jest prowincja gracza")
             return False
 
         #czy province_to nie należy do gracza który teraz wykonuje ruch
         defender = self.map.province_list[ province_to ].player_id
         if player_id == defender :
+            print("province_to to nie jest prowincja przeciwnika")
             return False
 
         #czy province_from sąsiaduje z province_to
         if not self.if_adjacent( province_from, province_to ):
+            print("province_from i province_to nie sąsiadują")
             return False
 
         #czy province_from ma armie
@@ -291,18 +338,14 @@ class GameController:
 
         #czy province_from ma armie z przynajmniej jednym oddziałem
         army = self.map.province_list[ province_from ].army
-        if army.first_squad == None :
-            return False
-        
-        if army.second_squad == None :
+        if army.first_squad == None and army.second_squad == None :
+            print("armia jest pusta")
             return False
 
         # stoczenie bitwy
 
         attack = self.get_attack( province_from )
         defence = self.get_defence( province_to )
-
-        print( "Wynik: ", attack, defence )
 
         if attack > defence :
             #atakujący wygrał
@@ -311,34 +354,46 @@ class GameController:
             self.map.province_list[ province_from ].army = Army()
             self.map.province_list[ province_to ].player_id = attacker
         else:
-            self.map.province_list[ province_from ].army = None
+            self.map.province_list[ province_from ].army = Army()
 
-        return True
+        return (attack,defence)
 
     def move(self, province_from, squad_nr_from, province_to, squad_nr_to ):
 
+        if province_from == province_to:
+            print("to ta sama prowincja")
+            return False
+
         #czy jest faza ruchu
-        if not self.turn.get_phase == MOVEMENT_PHASE:
+        if not self.turn.get_phase() == MOVEMENT_PHASE:
+            print("to nie faza ruchu")
             return False
 
         #czy province_from istnieje
         if not self.map.check_province_by_id( province_from ):
+            print("province_from nie istnieje")
             return False
 
         #czy province_to istnieje
         if not self.map.check_province_by_id( province_to ):
+            print("province_to nie istnieje")
             return False
+        
+        player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
 
         #czy province_from należy do gracza który teraz wykonuje ruch
-        if self.player_list[ self.turn.get_current_player() ].player_id != self.map.province_list[ province_from ].player_id :
+        if player_id != self.map.province_list[ province_from ].player_id :
+            print("province_from nie nie należy do gracza")
             return False
 
         #czy province_to należy do gracza który teraz wykonuje ruch
-        if self.player_list[ self.turn.get_current_player() ].player_id != self.map.province_list[ province_to ].player_id :
+        if player_id != self.map.province_list[ province_to ].player_id :
+            print("province_to nie nie należy do gracza")
             return False
 
         #czy province_from sąsiaduje z province_to
         if not self.if_adjacent( province_from, province_to ):
+            print("province_to i province_from nie sąsiadują")
             return False
 
         #czy province_from ma armie
@@ -350,16 +405,19 @@ class GameController:
         if squad_from == None :
             return False
 
-        squad_to = self.map.province_list[ province_from ].army.get_squad( squad_nr_to )
-        squad_type = self.resource_manager.get_unit_by_id( squad_to.squad_type )
+        squad_to = self.map.province_list[ province_to ].army.get_squad( squad_nr_to )
+        squad_type = self.resource_manager.get_unit_by_id( squad_to )
         #czy province_to ma wolne miejsce na jednostki
-        if squad_to != None and squad_type == squad_from.squad_type and squad_type.max_quantity - squad_to.quantity >= squad_from.quantity :
+        if squad_to != None and squad_type != squad_from.squad_type and squad_type.max_quantity - squad_to.quantity >= squad_from.quantity :
+            print("nie ma miejsca na ruch")
             return False
         
         if squad_to == None :
             self.map.province_list[ province_from ].army.set_squad( squad_nr_to, squad_from )
         else:
+            print( squad_to.quantity, squad_from.quantity )
             squad_to.quantity += squad_from.quantity
+            self.map.province_list[ province_to ].army.set_squad( squad_nr_to, squad_to )
 
         self.map.province_list[ province_from ].army.set_squad( squad_nr_from, None )
 
@@ -369,6 +427,7 @@ class GameController:
 
         #czy jest faza kupowania
         if not self.turn.get_phase() == BUYING_PHASE:
+            print("to nie faza kupowania")
             return False
         
         player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
@@ -377,25 +436,33 @@ class GameController:
 
         #czy unit_type istnieje
         if not unit_type:
+            print("unit_type nie istnieje")
             return False
 
         #czy gracza stać na zakup
         if player.gold < unit_type.price :
+            print("nie ma wystarczająco złota")
             return False
         
         #czy province_to istnieje
         if not self.map.check_province_by_id( province_to ):
+            print("province_to nie istnieje")
             return False
         
         #czy province_to należy do gracza który teraz wykonuje ruch
         if player.player_id != self.map.province_list[ province_to ].player_id :
+            print("province_to nie należy do gracza")
             return False
         
         #czy province_to ma wolne miejsce na kupione jednostki
         if not self.map.province_list[ province_to ].army.check_can_buy_unit( unit_type ):
+            print("province_to nie ma wolnego miejsca")
             return False
         
-        self.map.province_list[ province_to ].army.buy_unit( unit_type )
+        self.map.province_list[ province_to ].army.buy_unit( unit_type_id, unit_type )
+        price = unit_type.price
+        player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
+        self.player_list[ player_id ].gold -= price
 
         return True
 
@@ -418,3 +485,11 @@ class GameController:
     def next_phase(self):
         if self.turn.next_phase():
             self.__income_calculation()
+
+    def check_win(self):
+        player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
+
+        for province_id, province in self.map.province_list.items():
+            if( province.player_id != player_id ):
+                return False
+        return True
