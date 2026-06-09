@@ -253,10 +253,23 @@ def test_game_buy_unit( game_controller ):
 
 def test_game_attack_lose( game_controller ):
 
+    class FakeRng:
+
+        def __init__(self):
+            self.values = [1,1,1,6,6,6]
+
+        def roll_dice(self, max_dice):
+            return self.values.pop(0)
+        
+    game_controller.roll = FakeRng()
+
     province_from_id = 45
     province_to_id = 50
 
     game_controller.next_phase()
+
+    assert game_controller.map.province_list[province_from_id].army.get_squad(1).quantity == 1
+    assert game_controller.map.province_list[province_from_id].army.get_squad(2).quantity == 2
 
     assert game_controller.attack( province_from_id, province_to_id ) == True
 
@@ -266,13 +279,56 @@ def test_game_attack_lose( game_controller ):
 
 def test_game_attack_win( game_controller ):
 
+    class FakeRng:
+
+        def __init__(self):
+            self.values = [6,6,6,1,1,1]
+
+        def roll_dice(self, max_dice):
+            return self.values.pop(0)
+        
+    game_controller.roll = FakeRng()
+
     province_from_id = 45
     province_to_id = 50
 
     game_controller.next_phase()
 
+    assert game_controller.map.province_list[province_from_id].army.get_squad(1).quantity == 1
+    assert game_controller.map.province_list[province_from_id].army.get_squad(2).quantity == 2
+
+    assert game_controller.map.province_list[province_to_id].army.get_squad(1).quantity == 1
+    assert game_controller.map.province_list[province_to_id].army.get_squad(2).quantity == 2
+
     assert game_controller.attack( province_from_id, province_to_id ) == True
 
-    assert game_controller.map.province_list[ province_from_id ].army == None
     assert game_controller.map.province_list[ province_from_id ].player_id == 1
     assert game_controller.map.province_list[ province_to_id ].player_id == 1
+
+def test_game_attack_draw( game_controller ):
+
+    class FakeRng:
+
+        def __init__(self):
+            self.values = [4,4,4,1,1,1]
+
+        def roll_dice(self, max_dice):
+            return self.values.pop(0)
+        
+    game_controller.roll = FakeRng()
+
+    province_from_id = 45
+    province_to_id = 50
+
+    game_controller.next_phase()
+
+    assert game_controller.map.province_list[province_from_id].army.get_squad(1).quantity == 1
+    assert game_controller.map.province_list[province_from_id].army.get_squad(2).quantity == 2
+
+    assert game_controller.map.province_list[province_to_id].army.get_squad(1).quantity == 1
+    assert game_controller.map.province_list[province_to_id].army.get_squad(2).quantity == 2
+
+    assert game_controller.attack( province_from_id, province_to_id ) == True
+
+    assert game_controller.map.province_list[ province_from_id ].player_id == 1
+    assert game_controller.map.province_list[ province_to_id ].player_id == 2

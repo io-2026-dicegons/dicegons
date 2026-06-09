@@ -7,6 +7,7 @@ from game.player import Player
 from game.army import Army
 from game.province import Province
 from game.terrain import TerrainType
+from game.roll import Roll
 
 class GameController:
 
@@ -15,6 +16,7 @@ class GameController:
         self.player_list = {}
         self.turn = Turn()
         self.resource_manager = resource_manager
+        self.roll = Roll()
 
     #funkcje UI get
     def get_player_list(self):
@@ -28,7 +30,6 @@ class GameController:
                 provinces_id_list.append( province_id )
 
         return provinces_id_list
-
 
     def get_player_hexes(self, player_id):
         heks = []
@@ -209,6 +210,50 @@ class GameController:
 
         return False
 
+    def get_attack( self, province_from ):
+        
+        province = self.map.province_list[ province_from ]
+        army = province.army
+        squad_1 = army.get_squad(1)
+        squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
+        squad_2 = army.get_squad(2)
+        squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
+
+        attack = 0
+
+        for i in range(1, squad_1.quantity+1):
+            unit_attack = self.roll.roll_dice( squad_1_type.attack_dice )
+            attack += unit_attack
+
+        for i in range(1, squad_2.quantity+1):
+            unit_attack = self.roll.roll_dice( squad_2_type.attack_dice )
+            attack += unit_attack
+
+        return attack
+    
+    def get_defence( self, province_from ):
+        
+        province = self.map.province_list[ province_from ]
+        army = province.army
+        squad_1 = army.get_squad(1)
+        squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
+        squad_2 = army.get_squad(2)
+        squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
+        terrain_modifier = self.resource_manager.get_terrain_by_id( province.terrain ).defence_modifier
+        building_modifier = self.resource_manager.get_building_by_id( province.building ).defence_modifier
+
+        defence = 0
+
+        for i in range(1,squad_1.quantity+1):
+            unit_defence = self.roll.roll_dice( squad_1_type.attack_dice ) + terrain_modifier + building_modifier
+            defence += unit_defence
+
+        for i in range(1,squad_2.quantity+1):
+            unit_defence = self.roll.roll_dice( squad_2_type.attack_dice ) + terrain_modifier + building_modifier
+            defence += unit_defence
+
+        return defence
+
     def attack(self, province_from, province_to):
 
         player_id = list(self.player_list.keys())[ self.turn.get_current_player() ]
@@ -254,16 +299,17 @@ class GameController:
 
         # stoczenie bitwy
 
-        attack = self.map.province_list[ province_from ].get_attack()
-        defence = self.map.province_list[ province_to ].get_defence()
+        attack = self.get_attack( province_from )
+        defence = self.get_defence( province_to )
+
+        print( "Wynik: ", attack, defence )
 
         if attack > defence :
             #atakujący wygrał
             self.map.province_list[ province_to ].army = None
             self.map.province_list[ province_to ].army = self.map.province_list[ province_from ].army
             self.map.province_list[ province_from ].army = Army()
-
-            self.map.province_list[ province_to ].player_id = self.attacker
+            self.map.province_list[ province_to ].player_id = attacker
         else:
             self.map.province_list[ province_from ].army = None
 
