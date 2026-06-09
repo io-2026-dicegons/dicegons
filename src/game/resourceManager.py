@@ -44,10 +44,13 @@ class ResourceManager:
                         max_defensive_result = item["Max_Obronny_Rzut"],
                         min_defensive_result = item["Min_Obronny_Rzut"],
                         max_offensive_result = item["Max_Atakujacy_Rzut"],
-                        min_offensive_result = item["Min_Atakujacy_Rzut"]
+                        min_offensive_result = item["Min_Atakujacy_Rzut"],
+                        symbol = item["symbol"],
+                        symbol_code = item["symbol_code"]
                     )
                     self.unit_types[current.id_unit_type] = current
             except KeyError:
+                print ("File with unit types definitions malformed. Loading placeholder unit and aborting")
                 self.unit_types = { UnitType() }   
                 
         except (FileNotFoundError, PermissionError) as exc:
@@ -72,10 +75,13 @@ class ResourceManager:
                         name = item["name"],
                         id = item["id"],
                         defence_modifier = item["defence_modifier"],
-                        income_modifier = item["income_modifier"]
+                        income_modifier = item["income_modifier"],
+                        symbol = item["symbol"],
+                        symbol_code = item["symbol_code"]
                     )
                     self.building_types[current.id] = current
             except KeyError:
+                print ("File with buildings types definitions malformed. Loading placeholder building with id and aborting")
                 self.building_types = { Building() }
         except (FileNotFoundError, PermissionError) as exc:
             print ("File with building types definitions missing or unreadable. Loading placeholder building with id0")
@@ -104,6 +110,7 @@ class ResourceManager:
                     )
                     self.terrain_types[current_terrain.id] = current_terrain
             except KeyError:
+                print ("File with terrain types definitions malformed.  Loading placeholder terrain with id 0 and aborting")
                 self.terrain_types = { TerrainType() }
         
         except (FileNotFoundError, PermissionError) as exc:
@@ -118,8 +125,7 @@ class ResourceManager:
         if unit_id in self.unit_types:
             return self.unit_types[unit_id]
         else:
-            return UnitType()
-        pass
+            return None
     
     def get_building_types(self):
         return self.building_types
@@ -128,7 +134,7 @@ class ResourceManager:
         if b_id in self.building_types:
             return self.building_types[b_id]
         else:
-            return Building()
+            return None
         
     def get_terrain_types(self):
         return self.terrain_types
@@ -137,6 +143,5 @@ class ResourceManager:
         if t_id in self.terrain_types:
             return self.terrain_types[t_id]
         else:
-            default_terrain = TerrainType()
-            return default_terrain
+            return None
 

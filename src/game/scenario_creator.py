@@ -32,8 +32,8 @@ class ScenarioCreator:
                 province.add_hexagon( [i,j*3+1] )
                 province.add_hexagon( [i,j*3+2] )
 
-                squad_1 = Squad( 0, 1, 1 )
-                squad_2 = Squad( 0, 2, 2 )
+                squad_1 = Squad( 0, 0, 1 )
+                squad_2 = Squad( 0, 1, 2 )
 
                 army = Army()
                 army.set_squad( 1, squad_1 )
@@ -42,7 +42,11 @@ class ScenarioCreator:
                 province.set_army( army )
 
                 province.building = 1
-                province.terrain = 1
+                if( i % 2 == 0 ):
+                    province.terrain = 1
+                else:
+                    province.terrain = 2
+
 
                 game_controller.map.add_province( province )
 
