@@ -1,4 +1,5 @@
 import pygame
+import pygame.freetype
 import sys
 import math
 import json 
@@ -264,26 +265,7 @@ class GameWindowClass:
         font_index = GameController.get_building_symbol_code(self, buildingID)
         symbol = GameController.get_building_symbol(self, buildingID)
 
-        #symbol = '\u028F'
-        size = int(3/2 * self.hex_size)
-        # symbol = "h"
-        # symbol = "‡"
-
-
-        if( font_index == 0):
-            font = pygame.font.SysFont("webdings", size)  
-        elif(font_index == 1):
-            font = pygame.font.SysFont("wingdings", size)  
-        elif(font_index == 2):
-            font = pygame.font.SysFont("wingdings2", size)  
-        else:
-            font = pygame.font.SysFont("wingdings3", size)  
-
-        #font = pygame.font.SysFont("Segoe UI Symbol", size)
-        # font = pygame.font.SysFont("freesansbold", int(3/2 * self.hex_size)) 
-        text = font.render(symbol, True, "Black", None)
-        textRect = text.get_rect()
-
+        font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 24 )
 
         w = math.sqrt(3) * self.hex_size
         h = 2 * self.hex_size
@@ -297,9 +279,7 @@ class GameWindowClass:
         pos_X = self.start_draw_pos[0] + x_offset
         pos_Y = self.start_draw_pos[1] + y_offset
 
-        textRect.center = (pos_X, pos_Y)
-        textRect.center = (pos_X  - self.hex_size * 0.05, pos_Y + self.hex_size * 0.05)
-        surface.blit(text, textRect)
+        font.render_to(surface, (pos_X  - self.hex_size * 0.5, pos_Y - self.hex_size * 0.5 ), symbol, (0, 0, 0))
 
     def draw_squad(self, surface, symbol, font_index, count, hex_list, squad_number):
         w = math.sqrt(3) * self.hex_size
@@ -321,26 +301,15 @@ class GameWindowClass:
 
         text_font = pygame.font.SysFont(self.font, font_size, True)
 
-        if(font_index == 0):
-            font = pygame.font.SysFont("webdings", font_size)  
-        elif(font_index == 1):
-            font = pygame.font.SysFont("wingdings", font_size)  
-        elif(font_index == 2):
-            font = pygame.font.SysFont("wingdings2", font_size)  
-        else:
-            font = pygame.font.SysFont("wingdings3", font_size)  
-
-        text_symbol = font.render(symbol, True, "Black", None)
-        text_symbol_rect = text_symbol.get_rect()
+        font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 16 )
 
         text_text = text_font.render(count, True, "Black", None)
         text_text_rect = text_text.get_rect()
 
-        #textRect.center = (pos_X, pos_Y)
-        text_symbol_rect.center = (pos_X  - self.hex_size * 0.05, pos_Y + self.hex_size * 0.05 - self.hex_size/3)
-        surface.blit(text_symbol, text_symbol_rect) 
+        font.render_to(surface, (pos_X  - self.hex_size * 0.4, pos_Y - self.hex_size * 0.2 - self.hex_size/3), symbol, (0, 0, 0))
+
         text_text_rect.center = (pos_X  - self.hex_size * 0.05, pos_Y + self.hex_size * 0.05 + self.hex_size/3)
-        surface.blit(text_text, text_text_rect)  
+        surface.blit(text_text, text_text_rect)
 
     def draw_army(self, surface, symbol_one, font_index_one, count_one, symbol_two, font_index_two, count_two, hex_list):        
         self.draw_squad(surface, symbol_one, font_index_one, count_one, hex_list, 1)
@@ -625,7 +594,7 @@ class GameWindowClass:
 
             positions = (positions[0], positions[1] + shift * line_size)
 
-            Income = text_font.render("Obrońca", True, font_color)
+            Income = text_font.render("Obrońca:", True, font_color)
             Income_rect = text_player.get_rect(midleft = positions )
             surface.blit(Income, Income_rect)
 
@@ -643,7 +612,6 @@ class GameWindowClass:
             # print(self.clicked["id"])
 
             symbol = self.game_controler.get_unit_symbol(unit_id)
-            # symbol = 'A'
 
             font_index = self.game_controler.get_unit_symbol_code( unit_id )
             # font_index = 0
@@ -660,25 +628,10 @@ class GameWindowClass:
 
             #pygame.draw.line(surface, self.GUI_gradient, [center[0] + offset, center[1] - line_size], [center[0] + offset, center[1] + line_size], 5)
 
-            if(font_index == 0):
-                font = pygame.font.SysFont("webdings", font_view_size)  
-            elif(font_index == 1):
-                font = pygame.font.SysFont("wingdings", font_view_size)  
-            elif(font_index == 2):
-                font = pygame.font.SysFont("wingdings2", font_view_size)  
-            else:
-                font = pygame.font.SysFont("wingdings3", font_view_size)  
+            font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 32 )
+            font.render_to(surface, (name_position[0], name_position[1] + 1.5 * font_size ), symbol, (0, 0, 0))
 
-            text_symbol = font.render(symbol, True, "Black", None)
-            text_symbol_rect = text_symbol.get_rect()
-            text_symbol_rect.center = (name_position[0], name_position[1] + 1.5 * font_size )
-
-            surface.blit(text_symbol, text_symbol_rect)
-
-            
             text_font = pygame.font.SysFont(self.font, font_size, True )
-
-            
 
             positions = (self.viewSize[0] + 15, center[1] - 0.75 * line_size)
 
@@ -802,23 +755,10 @@ class GameWindowClass:
             
             font_index = self.game_controler.get_building_symbol_code( building_id )
             font_view_size = font_size + 16
-            symbol = self.game_controler.get_building_symbol( building_id)
+            symbol = self.game_controler.get_building_symbol( building_id) 
 
-            if(font_index == 0):
-                font = pygame.font.SysFont("webdings", font_view_size)  
-            elif(font_index == 1):
-                font = pygame.font.SysFont("wingdings", font_view_size)  
-            elif(font_index == 2):
-                font = pygame.font.SysFont("wingdings2", font_view_size)  
-            else:
-                font = pygame.font.SysFont("wingdings3", font_view_size)  
-
-            text_symbol = font.render(symbol, True, "Black", None)
-            text_symbol_rect = text_symbol.get_rect()
-            text_symbol_rect.center = (center[0], positions[1] )
-
-            surface.blit(text_symbol, text_symbol_rect)
-
+            font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 32 )
+            font.render_to(surface, (center[0] - 15, positions[1] - 15 ), symbol, (0, 0, 0))
             
             text_font = pygame.font.SysFont(self.font, font_size, True )
             positions = (positions[0], positions[1] + 1.1 * shift * line_size)
@@ -971,37 +911,12 @@ class GameWindowClass:
         for i in unit_types:
             unit_number += 1
 
-        # print(self.resource_manager.get_unit_by_id(0).name)
-
-
-
-        for i in range (0, unit_number):
-            # font_index = self.game_controler.get_unit_symbol_code(self.game_controler, i)
-            
+        for i in range (0, unit_number):            
             symbol = self.game_controler.get_unit_symbol(i)
-            font_index = self.game_controler.get_unit_symbol_code(i)
+            font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 48 )
 
-
-            # font_index = self.game_controler.get_unit_symbol_code(i)
-            # symbol = self.game_controler.get_unit_symbol(i)
-
-            if(font_index == 0):
-                font = pygame.font.SysFont("webdings", font_size)  
-            elif(font_index == 1):
-                font = pygame.font.SysFont("wingdings", font_size)  
-            elif(font_index == 2):
-                font = pygame.font.SysFont("wingdings2", font_size)  
-            else:
-                font = pygame.font.SysFont("wingdings3", font_size)  
-
-            text_symbol = font.render(symbol, True, "Black", None)
-            text_symbol_rect = text_symbol.get_rect()
-
-            position = ((points[0][0] + (i + 1) * size[0]/(unit_number + 1),  points[0][1] - size[1]/2))
-
-            text_symbol_rect.center = position
-            pygame.draw.rect(surface, gradient_color, text_symbol_rect, 0)
-            surface.blit(text_symbol, text_symbol_rect)
+            position = ((points[0][0] + (i + 1) * size[0]/(unit_number + 1)-10,  points[0][1] - size[1]/2-20))
+            font.render_to(surface, position, symbol, (0, 0, 0))
 
     def draw_GUI(self, surface):
         self.draw_bottom(surface)

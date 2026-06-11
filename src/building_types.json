@@ -10,11 +10,11 @@
             "symbol_code": 0
         },
         {
-            "name": "Wall",
+            "name": "Castle",
             "id": 1,
             "defence_modifier": 1,
-            "income_modifier": 0,
-            "symbol": "d",
+            "income_modifier": 2,
+            "symbol": "🏰",
             "symbol_code": 0
         },
         {

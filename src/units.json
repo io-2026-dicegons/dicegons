@@ -13,8 +13,8 @@
       "Min_Obronny_Rzut": 1,
       "Max_Atakujacy_Rzut": 6,
       "Min_Atakujacy_Rzut": 1,
-      "symbol": "s",
-      "symbol_code": 1
+      "symbol": "⚔",
+      "symbol_code": 0
     },
     {
       "ID_Typu_Jednostki": 1,

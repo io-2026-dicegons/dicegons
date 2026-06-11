@@ -22,7 +22,7 @@ class ResourceManager:
 
     def load_unit_types(self, file_path):
         try:
-            with open(file_path, 'r') as fi:
+            with open(file_path, 'r', encoding="utf-8") as fi:
                 try:
                     data = json.load(fi)
                 except json.JSONDecodeError:
@@ -62,7 +62,7 @@ class ResourceManager:
     def load_building_types(self, file_path):
         
         try:
-            with open(file_path, 'r') as fi:
+            with open(file_path, 'r', encoding="utf-8") as fi:
                 try:
                     data = json.load(fi)
                 except json.JSONDecodeError:
@@ -91,7 +91,7 @@ class ResourceManager:
     def load_terrain_types(self, file_path):
         
         try:
-            with open(file_path, 'r') as fi:                
+            with open(file_path, 'r', encoding="utf-8") as fi:                
                 try:
                     data = json.load(fi)
                 except json.JSONDecodeError:
