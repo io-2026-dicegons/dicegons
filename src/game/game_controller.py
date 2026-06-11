@@ -99,7 +99,12 @@ class GameController:
     
 
     def get_building_symbol(self, building_id):
-        return self.resource_manager.get_building_by_id( building_id ).symbol
+        building_type = self.resource_manager.get_building_by_id( building_id )
+
+        if building_type == None:
+            return ''
+
+        return building_type.symbol
     
     def get_building_symbol_code(self, building_id):
         return self.resource_manager.get_building_by_id( building_id ).symbol_code
@@ -111,6 +116,7 @@ class GameController:
         return self.resource_manager.get_building_by_id( building_id ).defence_modifier
     
     def get_building_name(self, building_id):
+        print(building_id)
         return self.resource_manager.get_building_by_id( building_id ).name
     
 

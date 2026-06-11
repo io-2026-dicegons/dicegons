@@ -1,5 +1,6 @@
 import pygame
 import pygame.freetype
+import random
 import sys
 import math
 import json 
@@ -31,7 +32,14 @@ class GameWindowClass:
         self.game_controler = GameController(self.resource_manager)
 
         self.scenario_loader = ScenarioCreator()
-        self.game_controler = self.scenario_loader.scenario_1(self.game_controler)
+
+        scenario_count = 2
+        n = random.randint(1, scenario_count)
+
+        if n == 1:
+            self.game_controler = self.scenario_loader.scenario_1(self.game_controler)
+        if n == 2:
+            self.game_controler = self.scenario_loader.scenario_2(self.game_controler)
 
         self.error = False
             
@@ -88,14 +96,6 @@ class GameWindowClass:
 
         self.all_provinces = self.game_controler.get_player_provinces(1)
         self.all_provinces += self.game_controler.get_player_provinces(2)
-
-
-        with open("scenario_one.json") as f:
-            scenario_data = json.load(f)
-
-        self.provinces = scenario_data["provinces"]
-        # print(self.provinces)
-
     
     def draw_hex(self, surface, color, width, position ): 
         
@@ -262,7 +262,6 @@ class GameWindowClass:
     def draw_building(self, surface, buildingID, hex_list):
         
         position = hex_list[2]
-        font_index = GameController.get_building_symbol_code(self, buildingID)
         symbol = GameController.get_building_symbol(self, buildingID)
 
         font = pygame.freetype.Font(r"fonts/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf", 24 )
@@ -354,7 +353,6 @@ class GameWindowClass:
         for i in self.all_provinces:
             # print(i)
             if(self.glow == i):
-            # print(color)
                 province_hexes = self.game_controler.get_province_hex_list(i)
                 self.draw_border_map(surface, province_hexes, "yellow", 4)
 
@@ -753,7 +751,6 @@ class GameWindowClass:
             
             # print(self.game_controler.get_building_symbol( building_id))
             
-            font_index = self.game_controler.get_building_symbol_code( building_id )
             font_view_size = font_size + 16
             symbol = self.game_controler.get_building_symbol( building_id) 
 
