@@ -1093,7 +1093,7 @@ class GameWindowClass:
                     self.draw_GUI(self.gameWindow)
 
                     self.win = self.game_controler.check_win()
-                    self.win = False
+                    
                     if self.win:
                         player_id = self.game_controler.get_current_player_id()
                         player_nick = self.game_controler.player_list[ player_id ].nick
