@@ -30,7 +30,7 @@ class GameWindowClass:
         self.game_controler = GameController(self.resource_manager)
 
         self.scenario_loader = ScenarioCreator()
-        self.game_controler = self.scenario_loader.scenario_1(self.game_controler)
+        self.game_controler = self.scenario_loader.scenario_2(self.game_controler)
 
         self.error = False
             
@@ -500,20 +500,20 @@ class GameWindowClass:
         
         # pygame.draw.polygon(surface, "red", turn_timer_points, 0)
         points_place = [turn_timer_points[0], turn_timer_points[1], [turn_timer_points[1][0], turn_timer_points[1][1] + 1/3 * turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + 1/3 * turn_timer_size[1]]]
-        points_attack = [[turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + 2/3 * turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + 2/3 * turn_timer_size[1]] ]
-        points_move = [[turn_timer_points[0][0], turn_timer_points[0][1]  + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] +  turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1]] ]
+        points_gold = [[turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 1/3], [turn_timer_points[1][0], turn_timer_points[1][1] + 2/3 * turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + 2/3 * turn_timer_size[1]] ]
+        points_attack = [[turn_timer_points[0][0], turn_timer_points[0][1]  + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] + turn_timer_size[1] * 2/3], [turn_timer_points[1][0], turn_timer_points[1][1] +  turn_timer_size[1]], [turn_timer_points[0][0], turn_timer_points[0][1] + turn_timer_size[1]] ]
         
 
         pygame.draw.polygon(surface, color, points_place)
-        pygame.draw.polygon(surface, gradient_color, points_attack)
-        pygame.draw.polygon(surface, color, points_move)
+        pygame.draw.polygon(surface, gradient_color, points_gold)
+        pygame.draw.polygon(surface, color, points_attack)
         
-        text_font = pygame.font.SysFont(self.font, font_size + 18, True ) 
+        text_font = pygame.font.SysFont(self.font, font_size + 28, True ) 
 
         #coin = 0
         coin = self.game_controler.get_player_gold( player_id )
         nick = self.game_controler.get_player_nick( player_id )
-        text = str(nick) + ": " + str(coin)
+        text = str(nick)
 
         text_player = text_font.render(text, True, "Black")
         text_player_rect = text_player.get_rect(midleft = (points[0][0], (points[0][1] + points[3][1])/2))
@@ -525,13 +525,13 @@ class GameWindowClass:
         text_place_rect = text_place.get_rect(midleft = (points_place[0][0], (points_place[0][1] + points_place[3][1]) / 2))
         surface.blit(text_place, text_place_rect)
 
+        text_gold = text_font.render("Gold: " + str(coin), True, "Black")
+        text_gold_rect = text_gold.get_rect(midleft = (points_gold[0][0], (points_gold[0][1] + points_gold[3][1]) / 2))
+        surface.blit(text_gold, text_gold_rect)
+
         text_attack = text_font.render("Attacking", True, "Black")
         text_attack_rect = text_attack.get_rect(midleft = (points_attack[0][0], (points_attack[0][1] + points_attack[3][1]) / 2))
         surface.blit(text_attack, text_attack_rect)
-
-        text_move = text_font.render("Moving", True, "Black")
-        text_move_rect = text_move.get_rect(midleft = (points_move[0][0], (points_move[0][1] + points_move[3][1]) / 2))
-        surface.blit(text_move, text_move_rect)
 
         text_font = pygame.font.SysFont("Wingdings3", font_size + 10, True )
 
@@ -541,11 +541,11 @@ class GameWindowClass:
         elif(turn_type == 1):
             arrow_points = (points_attack[0][0], (points_attack[0][1] + points_attack[3][1]) / 2)
         else: 
-            arrow_points = (points_move[0][0], (points_move[0][1] + points_move[3][1]) / 2)
+            arrow_points = (points_gold[0][0], (points_gold[0][1] + points_gold[3][1]) / 2)
 
-        text_move = text_font.render("a", True, "white")
-        text_move_rect = text_move.get_rect(midright = arrow_points)
-        surface.blit(text_move, text_move_rect)
+        text_attack = text_font.render("a", True, "white")
+        text_attack_rect = text_attack.get_rect(midright = arrow_points)
+        surface.blit(text_attack, text_attack_rect)
 
         
     def draw_null_block(self, surface):
@@ -642,11 +642,11 @@ class GameWindowClass:
 
             # print(self.clicked["id"])
 
-            # symbol = self.game_controler.get_unit_symbol(unit_id)
-            symbol = 'A'
+            symbol = self.game_controler.get_unit_symbol(unit_id)
+            # symbol = 'A'
 
-            # font_index = self.game_controler.get_unit_symbol_code( unit_id )
-            font_index = 0
+            font_index = self.game_controler.get_unit_symbol_code( unit_id )
+            # font_index = 0
 
             font_view_size = font_size + 16
 
@@ -979,7 +979,7 @@ class GameWindowClass:
             # font_index = self.game_controler.get_unit_symbol_code(self.game_controler, i)
             
             symbol = self.game_controler.get_unit_symbol(i)
-            font_index = self.game_controler.get_building_symbol_code(i)
+            font_index = self.game_controler.get_unit_symbol_code(i)
 
 
             # font_index = self.game_controler.get_unit_symbol_code(i)
@@ -1125,7 +1125,7 @@ class GameWindowClass:
                         if clicked["type"] == "unit":
                             self.selected_unit_type = self.clicked["id"]
 
-                            print("Unit:", self.clicked["id"])
+                            # print("Unit:", self.clicked["id"])
 
                         elif clicked["type"] == "province":
 
@@ -1159,7 +1159,7 @@ class GameWindowClass:
                                 else:
                                     #self.game_controler.move( province_from, 1, province_to, 1 )
 
-                                    print( "move:", province_from, province_to )
+                                    # print( "move:", province_from, province_to )
                                     self.province_clicked_1 = province_to
 
                             self.glow = self.clicked["id"]
@@ -1168,23 +1168,24 @@ class GameWindowClass:
 
                         elif clicked["type"] == "next_turn":
                             self.game_controler.next_phase()
-                            print("NEXT TURN")
+                            # print("NEXT TURN")
                             self.province_clicked_1 = None
                             self.selected_unit_type = None
                         
                         elif clicked["type"] == None:
-                            print("Null")
+                            # print("Null")
+                            pass
 
                     self.draw_game(self.viewSurface)
                     self.draw_glow(self.viewSurface)
                     self.draw_GUI(self.gameWindow)
 
                     self.win = self.game_controler.check_win()
-
+                    self.win = False
                     if self.win:
                         player_id = self.game_controler.get_current_player_id()
                         player_nick = self.game_controler.player_list[ player_id ].nick
-                        self.show_end( "Wygrał gracz: " + str(player_nick) )
+                        self.show_end( "Winner:  Player " + str(player_nick) )
             
             scaled = pygame.transform.smoothscale(self.viewSurface, self.viewSize)
             self.gameWindow.blit(scaled, (0, 0))
@@ -1210,4 +1211,3 @@ gameWindow = None
 
 game = GameWindowClass( gameWindow , 0, 0, 1, 24, 20, 15)
 game.runGame()
-

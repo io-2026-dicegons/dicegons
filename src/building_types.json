@@ -12,7 +12,7 @@
         {
             "name": "Wall",
             "id": 1,
-            "defence_modifier": 3,
+            "defence_modifier": 1,
             "income_modifier": 0,
             "symbol": "d",
             "symbol_code": 0
@@ -22,9 +22,26 @@
             "id": 2,
             "defence_modifier": 0,
             "income_modifier": 3,
-            "symbol": "F",
+            "symbol": "|",
+            "symbol_code": 1
+        }, 
+        {
+            "name": "Granary",
+            "id": 3,
+            "defence_modifier": -1,
+            "income_modifier": 2,
+            "symbol": "1",
             "symbol_code": 0
-        }        
+        }, 
+        {
+            "name": "University",
+            "id": 4,
+            "defence_modifier": 0,
+            "income_modifier": 1,
+            "symbol": "&",
+            "symbol_code": 1
+        }
+
     ]
 }
 
