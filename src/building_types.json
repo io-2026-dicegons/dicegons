@@ -22,7 +22,7 @@
             "id": 2,
             "defence_modifier": 0,
             "income_modifier": 3,
-            "symbol": "|",
+            "symbol": "🌾",
             "symbol_code": 1
         }, 
         {
@@ -30,15 +30,15 @@
             "id": 3,
             "defence_modifier": -1,
             "income_modifier": 2,
-            "symbol": "1",
+            "symbol": "🌽",
             "symbol_code": 0
         }, 
         {
-            "name": "University",
+            "name": "Church",
             "id": 4,
             "defence_modifier": 0,
             "income_modifier": 1,
-            "symbol": "&",
+            "symbol": "⛪",
             "symbol_code": 1
         }
 
