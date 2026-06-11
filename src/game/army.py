@@ -24,20 +24,21 @@ class Army:
         return False
     
     def buy_unit(self, unit_type_id, squad_type):
+
+        if self.first_squad != None and self.first_squad.squad_type == squad_type.id_unit_type and self.first_squad.quantity < squad_type.max_quantity :
+            self.first_squad.quantity = self.first_squad.quantity + 1
+            return True
+        
+        if self.second_squad != None and self.second_squad.squad_type == squad_type.id_unit_type and self.second_squad.quantity < squad_type.max_quantity :
+            self.second_squad.quantity = self.second_squad.quantity + 1
+            return True
+        
         if self.first_squad == None :
             self.first_squad = Squad(0,unit_type_id,1)
             return True
         
         if self.second_squad == None :
             self.second_squad = Squad(0,unit_type_id,1)
-            return True
-
-        if self.first_squad.squad_type == squad_type.id_unit_type and self.first_squad.quantity < squad_type.max_quantity :
-            self.first_squad.quantity = self.first_squad.quantity + 1
-            return True
-        
-        if self.second_squad.squad_type == squad_type.id_unit_type and self.second_squad.quantity < squad_type.max_quantity :
-            self.second_squad.quantity = self.second_squad.quantity + 1
             return True
         
         return False

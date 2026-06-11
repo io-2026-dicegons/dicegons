@@ -280,7 +280,7 @@ class GameController:
 
             squad_1_type = self.resource_manager.get_unit_by_id( squad_1.squad_type )
             for i in range(1,squad_1.quantity+1):
-                unit_defence = self.roll.roll_dice( squad_1_type.attack_dice ) + terrain_modifier + building_modifier
+                unit_defence = self.roll.roll_dice( squad_1_type.defensive_dice ) + terrain_modifier + building_modifier
                 defence += unit_defence
 
         squad_2 = army.get_squad(2)
@@ -290,7 +290,7 @@ class GameController:
             squad_2_type = self.resource_manager.get_unit_by_id( squad_2.squad_type )
 
             for i in range(1,squad_2.quantity+1):
-                unit_defence = self.roll.roll_dice( squad_2_type.attack_dice ) + terrain_modifier + building_modifier
+                unit_defence = self.roll.roll_dice( squad_2_type.defensive_dice ) + terrain_modifier + building_modifier
                 defence += unit_defence
 
         return defence

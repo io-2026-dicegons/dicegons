@@ -10,21 +10,29 @@
             "symbol_code": 0
         },
         {
-            "name": "Wall",
+            "name": "Castle",
             "id": 1,
-            "defence_modifier": 3,
-            "income_modifier": 0,
-            "symbol": "d",
+            "defence_modifier": 1,
+            "income_modifier": 2,
+            "symbol": "🏰",
             "symbol_code": 0
         },
         {
             "name": "Farms",
             "id": 2,
             "defence_modifier": 0,
-            "income_modifier": 3,
-            "symbol": "F",
+            "income_modifier": 5,
+            "symbol": "🌾",
             "symbol_code": 0
-        }        
+        },
+        {
+            "name": "Church",
+            "id": 3,
+            "defence_modifier": 0,
+            "income_modifier": 3,
+            "symbol": "⛪",
+            "symbol_code": 0
+        }   
     ]
 }
 
