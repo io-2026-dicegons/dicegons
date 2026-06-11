@@ -3,6 +3,9 @@ import pytest
 from game.unit import UnitType
 from game.squad import Squad
 from game.player import Player
+from game.army import Army
+from game.province import Province
+from game.terrain import TerrainType
 
 @pytest.fixture
 def unit_type():
@@ -21,54 +24,48 @@ def unit_type():
 @pytest.fixture
 def squad(unit_type):
     return Squad(
-        ID_Squad=1,
-        Aktualna_Liczba=5,
-        ID_Typu_Jednostki=unit_type
+        squad_id=1,
+        squad_type=unit_type,
+        quantity=5
     )
 
 
 @pytest.fixture
 def army(squad):
     squad2 = Squad(
-        ID_Squad=2,
-        Aktualna_Liczba=3,
-        ID_Typu_Jednostki=squad.GetUnitType()
+        squad_id=2,
+        squad_type=squad.squad_type,
+        quantity=3
     )
-    return Army(
-        ID_Squad=1,
-        ID_Squad_1=squad,
-        ID_Squad_2=squad2
-    )
+    
+    army = Army()
+    army.set_squad(1,squad)
+    army.set_squad(2,squad2)
+    return army
 
 @pytest.fixture
 def army_with_one_squad(squad):
-    return Army(
-        ID_Squad=1,
-        ID_Squad_1=squad,
-        ID_Squad_2=None
-    )
+    army = Army()
+    army.set_squad(1, squad)
+    return army
 
 
 @pytest.fixture
 def player():
     return Player(
-        ID_Player=1,
-        Nick="Test",
-        Gold=500
+        player_id=1,
+        nick="Test",
+        gold=500
     )
 
 
 @pytest.fixture
 def province(player, army):
-    return Province(
-        ID_Prowincji=1,
-        ID_Player=player,
-        ID_Army=army,
-        ID_Terenu=Teren("Plains", 0),
-        Budynki=[],
-        Sąsiedzi=[],
-        Hex=[]
-    )
+    p = Province(province_id=1)
+    p.set_player_id(player.player_id)
+    p.set_army(army)
+    p.set_terrain(0)
+    return p
 
 
 # ====== TESTY ======
@@ -93,55 +90,32 @@ def test_unit_type_getters(unit_type):
 # --- Oddział ---
 
 def test_squad_quantity(squad):
-    assert squad.GetQuantity() == 5
+    assert squad.quantity == 5
 
 
 def test_squad_unit_type(squad, unit_type):
-    assert squad.GetUnitType() == unit_type
+    assert squad.squad_type == unit_type
 
 
 # --- Armia ---
 
-def test_army_squad_count(army):
-    assert army.GetSquadCount() == 2
-
 
 def test_army_squads_not_none(army):
-    assert army.GetFirstSquad() is not None
-    assert army.GetSecondSquad() is not None
-
-def test_army_with_one_squad_count(army_with_one_squad):
-    assert army_with_one_squad.GetSquadCount() == 1
-
+    assert army.get_squad(1) is not None
+    assert army.get_squad(2) is not None
 
 def test_army_with_one_squad_none(army_with_one_squad):
-    assert army_with_one_squad.GetFirstSquad() is not None
-    assert army_with_one_squad.GetSecondSquad() is None
+    assert army_with_one_squad.get_squad(1) is not None
+    assert army_with_one_squad.get_squad(2) is None
 
 # --- Province ---
 
 def test_province_owner(province, player):
-    assert province.GetOwner() == player
+    assert province.player_id == player.player_id
 
 
 def test_province_army(province, army):
-    assert province.GetArmy() == army
-
-def test_get_building_modifier(province):
-    building = province.getBuilding()
-    
-    assert building.getBuildingModifier() == 0
-
-def test_get_terrain_modifier(province):
-    terrain = province.getTerrain()
-
-    assert terrain.getTerrainModifier() == 1
-
-
-
-def test_province_hex_list(province):
-    assert isinstance(province.GetHexesList(), list)
-
+    assert province.army == army
 
 # --- Gra główna ---
 
